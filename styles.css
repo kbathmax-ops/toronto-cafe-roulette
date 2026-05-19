@@ -364,6 +364,42 @@ body {
   box-shadow: 0 0 0 2px rgba(52,199,89,0.25);
 }
 
+/* primary CTA inside the widget — glass-native */
+.w-cta {
+  margin-top: 14px;
+  width: 100%;
+  height: 46px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  position: relative;
+  isolation: isolate;
+}
+.w-cta::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 50%);
+  pointer-events: none;
+}
+.w-cta:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.22); transform: translateY(-1px); }
+.w-cta:active { transform: translateY(0) scale(0.98); }
+.w-cta svg { width: 16px; height: 16px; }
+
 /* ========================================
    interaction wiring (behavioral only — no
    change to the static Roast design above)

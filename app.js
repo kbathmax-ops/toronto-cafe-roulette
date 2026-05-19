@@ -93,6 +93,7 @@
     $("w-sub-tail").textContent = sp ? sp + (sp === 1 ? " spin today" : " spins today") : "Tonight";
     IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, t.lbl, t.val, t.small); });
     $("w-desc").textContent = IDLE.desc;
+    $("w-cta-label").textContent = "Match me";
     poolCount();
   }
 
@@ -113,6 +114,7 @@
     if (c.laptopFriendly === false) note = " · No laptops here.";
     else if (c.laptopFriendly === "tolerated") note = " · Laptops limited at peak.";
     $("w-desc").textContent = (c.vibe ? c.vibe.charAt(0).toUpperCase() + c.vibe.slice(1) : "") + "." + note;
+    $("w-cta-label").textContent = "Match again";
     poolCount();
   }
 
@@ -133,6 +135,7 @@
     spinning = true;
     triggers.forEach(function (el) { if (el) el.classList.add("spinning"); });
     $("w-desc").textContent = "Spinning the wheel…";
+    $("w-cta-label").textContent = "Matching…";
     IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, t.lbl, "·", ""); });
 
     var ticks = 14 + Math.floor(Math.random() * 6), i = 0;
@@ -156,6 +159,7 @@
   function doSpin() { spin(spinBtns); }
   $("f-spin").addEventListener("click", doSpin);
   $("rail-spin").addEventListener("click", doSpin);
+  $("w-cta").addEventListener("click", doSpin);
   $("dock").addEventListener("click", function () {
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
