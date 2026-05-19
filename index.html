@@ -1,107 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Toronto Cafe Roulette — spin for a place to work</title>
-<meta name="description" content="Can't decide where to work today? Spin the roulette for a Toronto cafe with outlets, good wifi and the right lighting." />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roast — Toronto Cafe Roulette</title>
+<meta name="description" content="Spin for a Toronto cafe to work from — outlets, wifi, lighting, noise. A coffee chat roulette over the city's best cafes.">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <span class="dot"></span>
-    Toronto Cafe Roulette
-  </div>
-  <nav class="views">
-    <button class="view-btn is-active" data-view="roulette">Roulette</button>
-    <button class="view-btn" data-view="grid">Grid</button>
-  </nav>
-</header>
-
-<main>
-  <section id="roulette-view" class="view">
-    <div class="stage">
-      <p class="kicker">Can't decide where to work today?</p>
-      <button id="wheel" class="wheel" aria-label="Spin for a cafe">
-        <span id="wheel-label" class="wheel-label">Spin</span>
-        <span class="wheel-hint">Click or press <kbd>space</kbd></span>
+<div id="root">
+  <div class="app">
+    <!-- left nav rail -->
+    <aside class="rail">
+      <div class="rail-logo" title="Roast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 9h12v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/>
+          <path d="M17 11h2a2 2 0 0 1 0 4h-2"/>
+          <path d="M7 5c0 1.5-1 1.5-1 3M11 5c0 1.5-1 1.5-1 3"/>
+        </svg>
+      </div>
+      <button class="rail-btn active" title="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h12v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M17 11h2a2 2 0 0 1 0 4h-2"/><path d="M7 5c0 1.5-1 1.5-1 3M11 5c0 1.5-1 1.5-1 3"/></svg>
       </button>
+      <button class="rail-btn" id="rail-spin" title="Spin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+      </button>
+      <button class="rail-btn" title="Map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+      </button>
+      <button class="rail-btn" title="Schedule">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+      </button>
+      <button class="rail-btn" title="Saved">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V4a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v17l7-4z"/></svg>
+      </button>
+      <button class="rail-btn" title="Favorites">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+      </button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+      <div class="rail-dot" title="412 online"></div>
+    </aside>
 
-      <article id="result" class="result" hidden>
-        <span class="result-tag" id="result-tag">Your spot</span>
-        <h2 id="result-name"></h2>
-        <p id="result-hood"></p>
-        <ul id="result-attrs" class="attrs"></ul>
-        <p id="result-vibe" class="vibe"></p>
-        <div class="result-actions">
-          <a id="result-maps" class="btn" target="_blank" rel="noopener">Open in Google Maps</a>
-          <button id="respin" class="btn ghost">Spin again</button>
-        </div>
-      </article>
+    <!-- stage -->
+    <main class="stage">
+      <div class="bg-img"></div>
 
-      <div id="empty" class="empty" hidden>
-        <h2>Nothing fits that brief</h2>
-        <p>No cafes match every filter. Loosen one — usually outlets or wifi — and spin again.</p>
-        <button id="empty-reset" class="btn ghost small">Reset filters</button>
+      <div class="os-time" id="os-time">00:00</div>
+      <div class="os-status">
+        <span class="live"><span class="pulse"></span> <span id="os-online">412</span> online</span>
       </div>
 
-      <p class="pool-line"><span id="pool-count">0</span> cafes in the pool · <span id="spin-count">0</span> spins today</p>
-    </div>
+      <!-- GLASS WIDGET (live result surface) -->
+      <section class="widget" aria-label="Toronto cafe roulette" aria-live="polite">
+        <header class="w-head">
+          <div>
+            <h1 id="w-title">Let's get you connected in Toronto's best cafes.</h1>
+            <div class="sub" id="w-sub">Toronto, ON <span class="dot">·</span> <span id="w-sub-tail">Tonight</span></div>
+          </div>
+          <div class="stat">
+            <span class="num" id="w-num">47</span>
+            <span class="unit" id="w-unit">spots</span>
+          </div>
+        </header>
 
-    <aside class="filters">
-      <h3>Set the deck</h3>
-      <label class="f">Outlets
-        <select id="f-outlets">
-          <option value="">any</option>
-          <option value="many">many</option>
-          <option value="some">some or more</option>
-        </select>
-      </label>
-      <label class="f">Wifi
-        <select id="f-wifi">
-          <option value="">any</option>
-          <option value="good">good</option>
-          <option value="ok">ok or better</option>
-        </select>
-      </label>
-      <label class="f">Lighting
-        <select id="f-light">
-          <option value="">any</option>
-          <option value="bright/natural">bright / natural</option>
-          <option value="moderate">moderate</option>
-          <option value="dim/moody">dim / moody</option>
-        </select>
-      </label>
-      <label class="f">Noise
-        <select id="f-noise">
-          <option value="">any</option>
-          <option value="quiet">quiet</option>
-          <option value="moderate">moderate or quieter</option>
-        </select>
-      </label>
-      <label class="f">Neighborhood
-        <select id="f-hood"><option value="">anywhere</option></select>
-      </label>
-      <label class="f check">
-        <input type="checkbox" id="f-laptop" checked />
-        Laptop-friendly only
-      </label>
-      <button id="reset" class="btn ghost small">Reset filters</button>
-    </aside>
-  </section>
+        <div class="w-grid" id="w-grid">
+          <div class="tile">
+            <div class="label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span class="lbl">Online</span>
+            </div>
+            <div class="value"><span class="val">412</span></div>
+          </div>
+          <div class="tile">
+            <div class="label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2"/></svg>
+              <span class="lbl">Avg. match</span>
+            </div>
+            <div class="value"><span class="val">94</span><small>%</small></div>
+          </div>
+          <div class="tile">
+            <div class="label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span class="lbl">Wait time</span>
+            </div>
+            <div class="value"><span class="val">2</span><small> min</small></div>
+          </div>
+          <div class="tile">
+            <div class="label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              <span class="lbl">Nearby</span>
+            </div>
+            <div class="value"><span class="val">8</span><small> cafes</small></div>
+          </div>
+        </div>
 
-  <section id="grid-view" class="view" hidden>
-    <div id="grid" class="grid"></div>
-  </section>
-</main>
+        <p class="w-desc" id="w-desc">
+          Pair with a stranger over coffee in walking distance. Choose your vibe,
+          spin the wheel, and we'll book a quiet table for two.
+        </p>
+      </section>
 
-<footer class="foot">
-  Crowd-sourced from Reddit-cited Toronto cafe guides. Attributes are best-effort — verify before you trek across town.
-</footer>
+      <!-- bottom-center dock -->
+      <button class="dock" id="dock" title="Reset">
+        <span class="dots"><span></span><span></span><span></span><span></span><span></span><span></span></span>
+      </button>
+
+      <!-- floating square glass buttons (bottom right) -->
+      <div class="f-btns">
+        <button class="f-btn" id="f-expand" title="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        </button>
+        <button class="f-btn" id="f-spin" title="Spin · find a match">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M21 21l-5.6-5.6"/><path d="M18.5 3l.6 1.9L21 5.5l-1.9.6L18.5 8l-.6-1.9L16 5.5l1.9-.6z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </main>
+  </div>
+</div>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
