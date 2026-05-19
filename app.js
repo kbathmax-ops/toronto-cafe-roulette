@@ -16,6 +16,17 @@
   var RANK = { many: 3, some: 2, few: 1, good: 3, ok: 2, none: 0, unknown: 0,
                quiet: 1, moderate: 2, lively: 3 };
 
+  var ICON = {
+    power: '<path d="M12 3v9"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',
+    wifi: '<path d="M5 12.6a11 11 0 0 1 14 0"/><path d="M1.5 9a16 16 0 0 1 21 0"/><path d="M8.5 16.1a6 6 0 0 1 7 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>',
+    volume: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>',
+    chair: '<path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M5 18v2M19 18v2"/>',
+    ban: '<circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/>',
+    alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12.01" y2="16.5"/>',
+  };
+  function svg(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[name] + "</svg>"; }
+
   // ---- DOM ----
   var $ = function (id) { return document.getElementById(id); };
   var wheel = $("wheel"), wheelLabel = $("wheel-label");
@@ -56,13 +67,13 @@
 
   function attrChips(c) {
     var items = [];
-    if (c.outlets !== "unknown") items.push({ t: "🔌 " + c.outlets + " outlets", good: RANK[c.outlets] >= 2 });
-    if (c.wifi !== "unknown") items.push({ t: "📶 wifi " + c.wifi, good: c.wifi === "good" });
-    if (c.lighting !== "unknown") items.push({ t: "💡 " + c.lighting });
-    if (c.noiseLevel !== "unknown") items.push({ t: "🔊 " + c.noiseLevel, good: c.noiseLevel === "quiet" });
-    if (c.seating !== "unknown") items.push({ t: "🪑 " + c.seating + " seating" });
-    if (c.laptopFriendly === false) items.push({ t: "🚫 no laptops", warn: true });
-    else if (c.laptopFriendly === "tolerated") items.push({ t: "⚠ laptops limited", warn: true });
+    if (c.outlets !== "unknown") items.push({ icon: "power", t: c.outlets + " outlets", good: RANK[c.outlets] >= 2 });
+    if (c.wifi !== "unknown") items.push({ icon: "wifi", t: "wifi " + c.wifi, good: c.wifi === "good" });
+    if (c.lighting !== "unknown") items.push({ icon: "sun", t: c.lighting });
+    if (c.noiseLevel !== "unknown") items.push({ icon: "volume", t: c.noiseLevel, good: c.noiseLevel === "quiet" });
+    if (c.seating !== "unknown") items.push({ icon: "chair", t: c.seating + " seating" });
+    if (c.laptopFriendly === false) items.push({ icon: "ban", t: "no laptops", warn: true });
+    else if (c.laptopFriendly === "tolerated") items.push({ icon: "alert", t: "laptops limited", warn: true });
     return items;
   }
 
@@ -70,10 +81,12 @@
   function pickAndShow() {
     var p = pool();
     if (!p.length) {
-      wheelLabel.textContent = "No match";
+      wheelLabel.textContent = "Spin";
       result.hidden = true;
+      $("empty").hidden = false;
       return;
     }
+    $("empty").hidden = true;
     var ticks = 14 + Math.floor(Math.random() * 6);
     var i = 0;
     wheel.classList.add("spinning");
@@ -98,14 +111,10 @@
     $("result-name").textContent = c.name;
     $("result-hood").textContent = c.neighborhood + (c.address ? " · " + c.address : "");
     var ul = $("result-attrs");
-    ul.innerHTML = "";
-    attrChips(c).forEach(function (a) {
-      var li = document.createElement("li");
-      li.textContent = a.t;
-      if (a.good) li.className = "is-good";
-      if (a.warn) li.className = "is-warn";
-      ul.appendChild(li);
-    });
+    ul.innerHTML = attrChips(c).map(function (a) {
+      var cls = a.good ? ' class="is-good"' : a.warn ? ' class="is-warn"' : "";
+      return "<li" + cls + ">" + svg(a.icon) + "<span>" + a.t + "</span></li>";
+    }).join("");
     $("result-vibe").textContent = "“" + c.vibe + "”";
     $("result-maps").href = mapsUrl(c);
     result.hidden = false;
@@ -139,8 +148,8 @@
       var card = document.createElement("div");
       card.className = "card";
       var chips = attrChips(c).map(function (a) {
-        var cls = a.good ? " class=\"is-good\"" : a.warn ? " class=\"is-warn\"" : "";
-        return "<li" + cls + ">" + a.t + "</li>";
+        var cls = a.good ? ' class="is-good"' : a.warn ? ' class="is-warn"' : "";
+        return "<li" + cls + ">" + svg(a.icon) + "<span>" + a.t + "</span></li>";
       }).join("");
       card.innerHTML =
         "<h3>" + c.name + (c.mine ? "<span class=\"mine-badge\">mine</span>" : "") + "</h3>" +
@@ -167,18 +176,22 @@
 
   function onFilterChange() {
     refreshPoolCount();
+    if (pool().length) $("empty").hidden = true;
     if (!$("grid-view").hidden) renderGrid();
+  }
+
+  function resetFilters() {
+    ["f-outlets", "f-wifi", "f-light", "f-noise", "f-hood"].forEach(function (id) { $(id).value = ""; });
+    $("f-laptop").checked = true;
+    onFilterChange();
   }
 
   ["f-outlets", "f-wifi", "f-light", "f-noise", "f-hood", "f-laptop"].forEach(function (id) {
     $(id).addEventListener("change", onFilterChange);
   });
 
-  $("reset").addEventListener("click", function () {
-    ["f-outlets", "f-wifi", "f-light", "f-noise", "f-hood"].forEach(function (id) { $(id).value = ""; });
-    $("f-laptop").checked = true;
-    onFilterChange();
-  });
+  $("reset").addEventListener("click", resetFilters);
+  $("empty-reset").addEventListener("click", resetFilters);
 
   wheel.addEventListener("click", pickAndShow);
   $("respin").addEventListener("click", pickAndShow);

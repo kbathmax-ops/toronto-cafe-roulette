@@ -7,7 +7,7 @@
 <meta name="description" content="Can't decide where to work today? Spin the roulette for a Toronto cafe with outlets, good wifi and the right lighting." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -42,6 +42,12 @@
           <button id="respin" class="btn ghost">Spin again</button>
         </div>
       </article>
+
+      <div id="empty" class="empty" hidden>
+        <h2>Nothing fits that brief</h2>
+        <p>No cafes match every filter. Loosen one — usually outlets or wifi — and spin again.</p>
+        <button id="empty-reset" class="btn ghost small">Reset filters</button>
+      </div>
 
       <p class="pool-line"><span id="pool-count">0</span> cafes in the pool · <span id="spin-count">0</span> spins today</p>
     </div>
