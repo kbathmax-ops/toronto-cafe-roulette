@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toronto Cafe Roulette — spin for a place to work</title>
+<meta name="description" content="Can't decide where to work today? Spin the roulette for a Toronto cafe with outlets, good wifi and the right lighting." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    Toronto Cafe Roulette
+  </div>
+  <nav class="views">
+    <button class="view-btn is-active" data-view="roulette">Roulette</button>
+    <button class="view-btn" data-view="grid">Grid</button>
+  </nav>
+</header>
+
+<main>
+  <section id="roulette-view" class="view">
+    <div class="stage">
+      <p class="kicker">Can't decide where to work today?</p>
+      <button id="wheel" class="wheel" aria-label="Spin for a cafe">
+        <span id="wheel-label" class="wheel-label">Spin</span>
+        <span class="wheel-hint">Click or press <kbd>space</kbd></span>
+      </button>
+
+      <article id="result" class="result" hidden>
+        <span class="result-tag" id="result-tag">Your spot</span>
+        <h2 id="result-name"></h2>
+        <p id="result-hood"></p>
+        <ul id="result-attrs" class="attrs"></ul>
+        <p id="result-vibe" class="vibe"></p>
+        <div class="result-actions">
+          <a id="result-maps" class="btn" target="_blank" rel="noopener">Open in Google Maps</a>
+          <button id="respin" class="btn ghost">Spin again</button>
+        </div>
+      </article>
+
+      <p class="pool-line"><span id="pool-count">0</span> cafes in the pool · <span id="spin-count">0</span> spins today</p>
+    </div>
+
+    <aside class="filters">
+      <h3>Set the deck</h3>
+      <label class="f">Outlets
+        <select id="f-outlets">
+          <option value="">any</option>
+          <option value="many">many</option>
+          <option value="some">some or more</option>
+        </select>
+      </label>
+      <label class="f">Wifi
+        <select id="f-wifi">
+          <option value="">any</option>
+          <option value="good">good</option>
+          <option value="ok">ok or better</option>
+        </select>
+      </label>
+      <label class="f">Lighting
+        <select id="f-light">
+          <option value="">any</option>
+          <option value="bright/natural">bright / natural</option>
+          <option value="moderate">moderate</option>
+          <option value="dim/moody">dim / moody</option>
+        </select>
+      </label>
+      <label class="f">Noise
+        <select id="f-noise">
+          <option value="">any</option>
+          <option value="quiet">quiet</option>
+          <option value="moderate">moderate or quieter</option>
+        </select>
+      </label>
+      <label class="f">Neighborhood
+        <select id="f-hood"><option value="">anywhere</option></select>
+      </label>
+      <label class="f check">
+        <input type="checkbox" id="f-laptop" checked />
+        Laptop-friendly only
+      </label>
+      <button id="reset" class="btn ghost small">Reset filters</button>
+    </aside>
+  </section>
+
+  <section id="grid-view" class="view" hidden>
+    <div id="grid" class="grid"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  Crowd-sourced from Reddit-cited Toronto cafe guides. Attributes are best-effort — verify before you trek across town.
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
