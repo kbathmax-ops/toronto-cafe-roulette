@@ -92,4 +92,17 @@ window.CAFES = [
 // Drop your Google Maps "saved cafes" picks here once you share the list.
 // They get merged + de-duped into the pool and flagged with a personal badge.
 // Example: { name: "Some Cafe", neighborhood: "...", mine: true }
-window.MY_MAPS_PICKS = [];
+window.MY_MAPS_PICKS = [
+  // --- Matches existing pool cafes: flags them as yours, keeps their attrs ---
+  { name: "Dark Horse Espresso Bar", neighborhood: "Kensington-Chinatown" },
+  { name: "Dark Horse Espresso Bar (Canary)", neighborhood: "Canary District" },
+  { name: "Project Seoul", neighborhood: "Kensington Market" },
+  { name: "10 Dean Cafe & Bar", neighborhood: "The Annex" },
+  { name: "Bevy @ The Combine", neighborhood: "Entertainment District" },
+
+  // --- New cafes from your Maps list (attrs unknown — verify in person) ---
+  { name: "Starbucks Coffee Company", neighborhood: "Toronto", address: null, outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: "unknown", noiseLevel: "unknown", vibe: "your Maps pick · 3.9★ chain coffee shop" },
+  { name: "BRANDOR COFFEE", neighborhood: "Toronto", address: null, outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: "unknown", noiseLevel: "unknown", vibe: "your Maps pick · 4.2★ coffee shop" },
+  { name: "Forno Cultura", neighborhood: "King West", address: null, outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: "unknown", noiseLevel: "unknown", vibe: "your Maps pick · 4.5★ artisan Italian bakery" },
+  { name: "Humble Donkey", neighborhood: "Toronto", address: null, outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: "unknown", noiseLevel: "unknown", vibe: "your Maps pick · 4.1★ cafe" }
+];
