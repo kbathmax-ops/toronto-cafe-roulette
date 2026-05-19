@@ -74,20 +74,22 @@
       result.hidden = true;
       return;
     }
-    var ticks = 16 + Math.floor(Math.random() * 8);
+    var ticks = 14 + Math.floor(Math.random() * 6);
     var i = 0;
     wheel.classList.add("spinning");
     result.hidden = true;
-    clearInterval(spinTimer);
-    spinTimer = setInterval(function () {
+    clearTimeout(spinTimer);
+    function tick() {
       wheelLabel.textContent = p[Math.floor(Math.random() * p.length)].name;
       if (++i >= ticks) {
-        clearInterval(spinTimer);
         wheel.classList.remove("spinning");
         showResult(p[Math.floor(Math.random() * p.length)]);
         bumpSpins();
+        return;
       }
-    }, 60 + i * 4);
+      spinTimer = setTimeout(tick, 40 + i * i * 1.2);
+    }
+    tick();
   }
 
   function showResult(c) {
