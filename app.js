@@ -158,6 +158,65 @@
     tick();
   }
 
+  /* ===== System 8: all-cafes grid ===== */
+  var gridBuilt = false;
+
+  function chipClass(attr, goodVal, midVal) {
+    if (attr === goodVal) return "cc-chip-green";
+    if (attr === midVal)  return "cc-chip-amber";
+    if (!attr || attr === "unknown") return "cc-chip-dim";
+    return "cc-chip-red";
+  }
+
+  function buildCafeGrid() {
+    if (gridBuilt) return;
+    gridBuilt = true;
+    var list = ALL;
+    $("cgp-count").textContent = list.length + " spots";
+    $("cgp-grid").innerHTML = list.map(function (c) {
+      var chips = [];
+      if (c.wifi && c.wifi !== "unknown") {
+        var label = c.wifi === "good" ? "wifi ✓" : c.wifi === "ok" ? "wifi ok" : "no wifi";
+        chips.push('<span class="cc-chip ' + chipClass(c.wifi, "good", "ok") + '">' + label + '</span>');
+      }
+      if (c.outlets && c.outlets !== "unknown") {
+        chips.push('<span class="cc-chip ' + chipClass(c.outlets, "many", "some") + '">⚡ ' + c.outlets + '</span>');
+      }
+      if (c.noiseLevel && c.noiseLevel !== "unknown") {
+        var nClass = c.noiseLevel === "quiet" ? "cc-chip-blue" : c.noiseLevel === "moderate" ? "cc-chip-amber" : "cc-chip-red";
+        chips.push('<span class="cc-chip ' + nClass + '">' + c.noiseLevel + '</span>');
+      }
+      if (c.lighting && c.lighting !== "unknown") {
+        var lClass = c.lighting === "bright/natural" ? "cc-chip-green" : c.lighting === "moderate" ? "cc-chip-amber" : "cc-chip-dim";
+        chips.push('<span class="cc-chip ' + lClass + '">☀ ' + (c.lighting === "bright/natural" ? "bright" : c.lighting) + '</span>');
+      }
+      var meta = c.neighborhood + (c.address ? " · " + c.address : "");
+      return '<div class="cafe-card" data-key="' + key(c) + '">' +
+        '<div class="cc-name">' + c.name + '</div>' +
+        '<div class="cc-meta">' + meta + '</div>' +
+        (chips.length ? '<div class="cc-chips">' + chips.join("") + "</div>" : "") +
+        "</div>";
+    }).join("");
+
+    $("cgp-grid").addEventListener("click", function (e) {
+      var card = e.target.closest(".cafe-card");
+      if (!card) return;
+      var k = card.dataset.key;
+      var cafe = ALL.find(function (c) { return key(c) === k; });
+      if (cafe) { closeGrid(); showResult(cafe); }
+    });
+  }
+
+  function openGrid() {
+    buildCafeGrid();
+    $("cafe-grid-panel").hidden = false;
+    $("rail-grid").classList.add("active");
+  }
+  function closeGrid() {
+    $("cafe-grid-panel").hidden = true;
+    $("rail-grid").classList.remove("active");
+  }
+
   /* ===== wire interactions onto existing (unchanged) elements ===== */
   var spinBtns = [$("f-spin"), $("rail-spin")];
   function doSpin() { spin(spinBtns); }
@@ -169,8 +228,12 @@
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
     $("topo-wrap").hidden = true;
     $("w-grid").style.visibility = "";
+    closeGrid();
     showIdle();
   });
+  $("rail-grid").addEventListener("click", openGrid);
+  $("cgp-close").addEventListener("click", closeGrid);
+
   $("f-expand").addEventListener("click", function () {
     var el = document.documentElement;
     if (document.fullscreenElement) document.exitFullscreen();

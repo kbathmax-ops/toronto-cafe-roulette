@@ -25,17 +25,8 @@
       <button class="rail-btn" id="rail-spin" title="Spin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
       </button>
-      <button class="rail-btn" title="Map">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
-      </button>
-      <button class="rail-btn" title="Schedule">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
-      </button>
-      <button class="rail-btn" title="Saved">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V4a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v17l7-4z"/></svg>
-      </button>
-      <button class="rail-btn" title="Favorites">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+      <button class="rail-btn" id="rail-grid" title="All cafes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       </button>
       <div class="rail-spacer"></div>
       <button class="rail-btn" title="Settings">
@@ -128,6 +119,18 @@
       <button class="dock" id="dock" title="Reset">
         <span class="dots"><span></span><span></span><span></span><span></span><span></span><span></span></span>
       </button>
+
+      <!-- all cafes grid panel -->
+      <div class="cafe-grid-panel" id="cafe-grid-panel" hidden>
+        <div class="cgp-header">
+          <span class="cgp-title">All cafes</span>
+          <span class="cgp-count" id="cgp-count"></span>
+          <button class="cgp-close" id="cgp-close" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="cgp-grid" id="cgp-grid"></div>
+      </div>
 
       <!-- floating square glass buttons (bottom right) -->
       <div class="f-btns">
