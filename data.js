@@ -116,6 +116,101 @@ window.CAFES = [
   { name: "Page One Coffee + Bar", neighborhood: "Downtown", address: "106 Mutual St", outlets: "some", wifi: "ok", lighting: "unknown", seating: "unknown", laptopFriendly: true, noiseLevel: "moderate", vibe: "downtown coffee-bar, good for longer stays" }
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CAFE_META — supplementary data merged at runtime (hours, links, addedAt)
+// key format matches key(c): "(name|neighborhood)".toLowerCase().trim()
+// ─────────────────────────────────────────────────────────────────────────────
+window.CAFE_META = {
+  // ── Well-known cafes: hours + socials ────────────────────────────────────
+  "dark horse espresso bar|kensington-chinatown":
+    { hours: "7am–9pm", website: "https://darkhorseespresso.ca", instagram: "darkhorseespresso" },
+  "dark horse espresso bar (canary)|canary district":
+    { hours: "7am–9pm", website: "https://darkhorseespresso.ca", instagram: "darkhorseespresso" },
+  "dark horse espresso bar (queen st e)|leslieville":
+    { hours: "7am–9pm", website: "https://darkhorseespresso.ca", instagram: "darkhorseespresso", addedAt: "2026-05-19" },
+  "hale coffee company|junction triangle":
+    { hours: "7am–5pm", website: "https://halecoffeecompany.ca", instagram: "halecoffeeco" },
+  "boxcar social|harbourfront":
+    { hours: "7am–11pm", website: "https://boxcarsocial.ca", instagram: "boxcarsocial" },
+  "boxcar social (summerhill)|summerhill":
+    { hours: "7am–10pm", website: "https://boxcarsocial.ca", instagram: "boxcarsocial" },
+  "neo coffee bar|st. lawrence":
+    { hours: "8am–5pm", website: "https://neocoffeebar.com", instagram: "neocoffeebar" },
+  "quantum coffee|king west":
+    { hours: "7am–8pm", instagram: "quantum.coffee" },
+  "jimmy's coffee|ossington":
+    { hours: "7am–7pm", website: "https://jimmyscoffee.ca", instagram: "jimmyscoffeeto" },
+  "balzac's coffee roasters (distillery)|distillery district":
+    { hours: "7am–9pm", website: "https://balzacs.com", instagram: "balzacsco" },
+  "balzac's coffee roasters (tmu)|yonge & dundas":
+    { hours: "7am–9pm", website: "https://balzacs.com", instagram: "balzacsco" },
+  "dineen coffee co.|financial district":
+    { hours: "7am–5pm", website: "https://dineencoffee.com", instagram: "dineencoffee" },
+  "dineen outpost|leslieville":
+    { hours: "8am–5pm", website: "https://dineencoffee.com", instagram: "dineencoffee" },
+  "rooster coffee house (broadview)|riverdale":
+    { hours: "7am–7pm", website: "https://roostercoffee.ca", instagram: "roostercoffeehouse" },
+  "rooster coffee house (jarvis)|church-wellesley":
+    { hours: "7am–7pm", website: "https://roostercoffee.ca", instagram: "roostercoffeehouse" },
+  "pilot coffee roasters (ossington)|ossington":
+    { hours: "7am–6pm", website: "https://pilotcoffeeroasters.com", instagram: "pilotcoffee" },
+  "moonbean coffee company|kensington market":
+    { hours: "8am–8pm", instagram: "moonbeancoffee" },
+  "cafe pamenar|kensington market":
+    { hours: "8am–10pm", instagram: "cafepamenar" },
+  "merchants of green coffee|riverside":
+    { hours: "8am–6pm", instagram: "merchantsofgreencoffee" },
+  "fix coffee + bikes|west queen west":
+    { hours: "7am–6pm", instagram: "fixcoffeeandbikes" },
+  "reunion island coffee bar|roncesvalles":
+    { hours: "7am–6pm", instagram: "reunionislandcoffee" },
+  "the library specialty coffee|chinatown":
+    { hours: "8am–6pm", instagram: "thelibraryspecialtycoffee" },
+  "good neighbour|koreatown":
+    { hours: "8am–5pm", instagram: "goodneighbourcoffee" },
+  "7 west cafe|church-wellesley":
+    { hours: "Open 24 hours", instagram: "7westcafe", addedAt: "2026-05-19" },
+  "crestfallen|koreatown":
+    { hours: "8am–7pm", instagram: "crestfallencoffee", addedAt: "2026-05-19" },
+  "le bleu coffee|st. clair west":
+    { instagram: "lebleucoffee", addedAt: "2026-05-19" },
+  "creeds coffee bar|annex":
+    { hours: "7am–6pm", instagram: "creedscoffeebar" },
+  "bevy @ the combine|entertainment district":
+    { hours: "7am–6pm", website: "https://bevycoffee.ca", instagram: "bevycoffeeto" },
+  "ace hotel lobby|king west":
+    { hours: "7am–10pm", website: "https://acehotel.com/toronto", instagram: "acehoteltoronto", addedAt: "2026-05-19" },
+  "glad day bookshop|church-wellesley":
+    { hours: "10am–10pm", website: "https://gladdaybookshop.com", instagram: "gladdaybookshop", addedAt: "2026-05-19" },
+  "dual citizen|queen west":
+    { hours: "8am–6pm", instagram: "dualcitizencafe", addedAt: "2026-05-19" },
+  "mola cafe/market|trinity bellwoods":
+    { hours: "8am–6pm", instagram: "molacafemarket", addedAt: "2026-05-19" },
+  "page one coffee + bar|downtown":
+    { hours: "7am–7pm", instagram: "pageonecoffee", addedAt: "2026-05-19" },
+  "propeller coffee|parkdale":
+    { hours: "7am–5pm", website: "https://propellercoffee.com", instagram: "propellercoffee", addedAt: "2026-05-19" },
+  "subtext|church-wellesley":
+    { instagram: "subtextcoffee", addedAt: "2026-05-19" },
+  "bevy|financial district":
+    { hours: "7am–6pm", instagram: "bevycoffeeto", addedAt: "2026-05-19" },
+  "915 dupont|dovercourt":
+    { instagram: "915dupont", addedAt: "2026-05-19" },
+  // ── New badge only (no extra data yet) ───────────────────────────────────
+  "miss lin cafe|north york":          { addedAt: "2026-05-19" },
+  "cafe n one|north york":             { addedAt: "2026-05-19" },
+  "baroness (yonge)|garden district":  { addedAt: "2026-05-19" },
+  "cafe 295|etobicoke":                { addedAt: "2026-05-19" },
+  "cafe x bica|summerhill":            { addedAt: "2026-05-19" },
+  "mabel's bakery & specialty foods|roncesvalles": { addedAt: "2026-05-19" },
+  "mast coffee|moss park":             { addedAt: "2026-05-19" },
+  "reply|financial district":          { addedAt: "2026-05-19" },
+  "the social blend|midtown":          { addedAt: "2026-05-19" },
+  "paris baguette|yonge & eglinton":   { addedAt: "2026-05-19" },
+  "the croissant tree|church-wellesley": { addedAt: "2026-05-19" },
+  "bloomers bloor|bloor west village": { addedAt: "2026-05-19" },
+};
+
 // Drop your Google Maps "saved cafes" picks here once you share the list.
 // They get merged + de-duped into the pool and flagged with a personal badge.
 // Example: { name: "Some Cafe", neighborhood: "...", mine: true }

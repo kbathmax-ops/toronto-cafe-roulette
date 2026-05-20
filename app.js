@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  /* ===== Supabase client ===== */
+  var SB_URL = "https://admlkeibdjttgslmffmy.supabase.co";
+  var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkbWxrZWliZGp0dGdzbG1mZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDIzNjUsImV4cCI6MjA5MjYxODM2NX0.MEDiE6IrQRJZXwgK5S_xXU6h8hkhxrIlp847nrUrxMs";
+  var sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+
   /* ===== System 1+2: pool build + Google Maps picks merge/dedupe ===== */
   function key(c) { return (c.name + "|" + (c.neighborhood || "")).toLowerCase().trim(); }
   var ALL = (window.CAFES || []).map(function (c) { return Object.assign({}, c); });
@@ -10,6 +15,12 @@
     var k = key(p);
     if (seen[k]) { Object.assign(seen[k], p, { mine: true }); }
     else { var n = Object.assign({}, p, { mine: true }); ALL.push(n); seen[k] = n; }
+  });
+  /* Merge CAFE_META (hours, website, instagram, addedAt) */
+  var META = window.CAFE_META || {};
+  ALL.forEach(function (c) {
+    var m = META[key(c)];
+    if (m) Object.assign(c, m);
   });
 
   var RANK = { many: 3, some: 2, few: 1, good: 3, ok: 2, none: 0, unknown: 0,
@@ -106,7 +117,8 @@
     $("w-unit").textContent = "spots";
   }
 
-  /* ===== System 6: spins-today counter (localStorage) ===== */
+  /* ===== System 6: spins-today counter + 5/day limit ===== */
+  var MAX_SPINS = 5;
   function today() { return new Date().toISOString().slice(0, 10); }
   function bumpSpins() {
     var d = today(), n = 1;
@@ -123,9 +135,73 @@
       return s.date === today() ? s.n : 0;
     } catch (e) { return 0; }
   }
+  function spinsLeft() { return Math.max(0, MAX_SPINS - spinsToday()); }
+
+  /* ===== Hash routing ===== */
+  function cafeSlug(c) {
+    return (c.name + "-" + (c.neighborhood || ""))
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function loadFromHash() {
+    var hash = window.location.hash;
+    if (hash && hash.startsWith("#cafe/")) {
+      var slug = hash.slice(6);
+      var cafe = ALL.find(function (c) { return cafeSlug(c) === slug; });
+      if (cafe) { showResult(cafe); return true; }
+    }
+    return false;
+  }
+
+  /* ===== "New" badge helper ===== */
+  function isNew(cafe) {
+    if (!cafe.addedAt) return false;
+    return (Date.now() - new Date(cafe.addedAt).getTime()) < 30 * 24 * 60 * 60 * 1000;
+  }
+
+  /* ===== Favorites (localStorage for guests, Supabase for authed) ===== */
+  var currentUser = null;
+  var currentCafe = null;
+  var dbFavs = [];
+  var guestFavs = [];
+  try { guestFavs = JSON.parse(localStorage.getItem("caffein_favs") || "[]"); } catch (e) {}
+
+  function isFav(cafeKey) {
+    return currentUser ? dbFavs.indexOf(cafeKey) >= 0 : guestFavs.indexOf(cafeKey) >= 0;
+  }
+  function updateStarBtn(cafeKey) {
+    var btn = $("star-btn");
+    if (!btn || btn.hidden) return;
+    var faved = isFav(cafeKey);
+    btn.classList.toggle("starred", faved);
+    btn.title = faved ? "Saved ★" : "Save this cafe";
+  }
+  function loadDbFavs() {
+    if (!currentUser || !sb) return;
+    sb.from("caffein_favorites").select("cafe_key")
+      .then(function (res) { dbFavs = (res.data || []).map(function (r) { return r.cafe_key; }); });
+  }
+  function toggleFav(cafe) {
+    var k = key(cafe);
+    if (currentUser && sb) {
+      if (isFav(k)) {
+        sb.from("caffein_favorites").delete().eq("cafe_key", k).eq("user_id", currentUser.id);
+        dbFavs = dbFavs.filter(function (x) { return x !== k; });
+      } else {
+        sb.from("caffein_favorites").insert({ user_id: currentUser.id, cafe_key: k, cafe_name: cafe.name });
+        dbFavs.push(k);
+      }
+    } else {
+      if (isFav(k)) { guestFavs = guestFavs.filter(function (x) { return x !== k; }); }
+      else { guestFavs.push(k); }
+      try { localStorage.setItem("caffein_favs", JSON.stringify(guestFavs)); } catch (e) {}
+    }
+    updateStarBtn(k);
+  }
 
   /* ===== idle / reset ===== */
   function showIdle() {
+    currentCafe = null;
+    try { history.pushState("", document.title, window.location.pathname); } catch (e) {}
     $("w-title").textContent = IDLE.title;
     var sp = spinsToday();
     $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span id="w-sub-tail"></span>';
@@ -134,11 +210,18 @@
     $("filter-chips").hidden = false;
     $("w-desc").textContent = IDLE.desc;
     $("w-cta-label").textContent = "Match me";
+    $("new-badge").hidden = true;
+    $("star-btn").hidden = true;
+    $("w-hours").hidden = true;
+    $("w-links").hidden = true;
     poolCount();
   }
 
   /* ===== System 4: result rendering (repurpose existing widget elements) ===== */
   function showResult(c) {
+    currentCafe = c;
+    try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
+
     $("w-grid").hidden = false;
     $("filter-chips").hidden = true;
     $("w-title").textContent = c.name;
@@ -147,10 +230,41 @@
     $("w-sub").firstChild.textContent = loc;
     if (c.mine) $("w-sub").lastChild.textContent = "from your Maps list";
 
+    /* new badge */
+    $("new-badge").hidden = !isNew(c);
+
+    /* star button */
+    $("star-btn").hidden = false;
+    updateStarBtn(key(c));
+
     setTile(0, iconSvg("power"), "Outlets", cap(attrText(c.outlets)), "");
     setTile(1, iconSvg("wifi"), "Wifi", cap(attrText(c.wifi)), "");
     setTile(2, iconSvg("sun"), "Lighting", cap(attrText(c.lighting)), "");
     setTile(3, iconSvg("volume"), "Noise", cap(attrText(c.noiseLevel)), "");
+
+    /* hours */
+    if (c.hours) {
+      $("w-hours-text").textContent = c.hours;
+      $("w-hours").hidden = false;
+    } else {
+      $("w-hours").hidden = true;
+    }
+
+    /* website + instagram links */
+    var hasWeb = !!c.website, hasIg = !!c.instagram;
+    if (hasWeb) {
+      $("w-link-web").href = c.website;
+      $("w-link-web").hidden = false;
+    } else {
+      $("w-link-web").hidden = true;
+    }
+    if (hasIg) {
+      $("w-link-ig").href = "https://instagram.com/" + c.instagram.replace(/^@/, "");
+      $("w-link-ig").hidden = false;
+    } else {
+      $("w-link-ig").hidden = true;
+    }
+    $("w-links").hidden = !(hasWeb || hasIg);
 
     var note = "";
     if (c.laptopFriendly === false) note = " · No laptops here.";
@@ -173,6 +287,14 @@
   /* ===== System 3: roulette spin (quadratic deceleration) ===== */
   function spin(triggers) {
     if (spinning) return;
+    if (spinsLeft() === 0) {
+      $("w-title").textContent = "You've had your 5 coffees today.";
+      $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span>come back tomorrow</span>';
+      $("w-desc").textContent = "Daily spin limit reached. Browse and favourites still work!";
+      $("w-grid").hidden = true;
+      $("filter-chips").hidden = true;
+      return;
+    }
     var p = pool();
     if (!p.length) { showEmpty(); return; }
     spinning = true;
@@ -383,5 +505,55 @@
     if (e.code === "Space") { e.preventDefault(); doSpin(); }
   });
 
-  showIdle();
+  /* ===== Auth modal ===== */
+  $("rail-auth").addEventListener("click", function () {
+    $("auth-modal").hidden = false;
+  });
+  $("auth-close").addEventListener("click", function () {
+    $("auth-modal").hidden = true;
+  });
+  $("auth-submit").addEventListener("click", function () {
+    var email = $("auth-email").value.trim();
+    if (!email || !sb) return;
+    sb.auth.signInWithOtp({
+      email: email,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    }).then(function () {
+      $("auth-form").hidden = true;
+      $("auth-sent").hidden = false;
+    });
+  });
+  $("auth-logout").addEventListener("click", function () {
+    if (sb) sb.auth.signOut();
+    $("auth-modal").hidden = true;
+  });
+  if (sb) {
+    sb.auth.onAuthStateChange(function (event, session) {
+      currentUser = session ? session.user : null;
+      if (currentUser) {
+        $("rail-auth-label").textContent = "Account";
+        $("auth-avatar").textContent = (currentUser.email || "?")[0].toUpperCase();
+        $("auth-user-email").textContent = currentUser.email || "";
+        $("auth-user").hidden = false;
+        $("auth-form").hidden = true;
+        $("auth-sent").hidden = true;
+        loadDbFavs();
+      } else {
+        $("rail-auth-label").textContent = "Sign in";
+        $("auth-user").hidden = true;
+        $("auth-form").hidden = false;
+        $("auth-sent").hidden = true;
+        dbFavs = [];
+      }
+      if (currentCafe) updateStarBtn(key(currentCafe));
+    });
+  }
+
+  /* ===== Star button ===== */
+  $("star-btn").addEventListener("click", function () {
+    if (currentCafe) toggleFav(currentCafe);
+  });
+
+  /* ===== Init: restore from hash or show idle ===== */
+  if (!loadFromHash()) showIdle();
 })();

@@ -381,6 +381,242 @@ body {
   box-shadow: 0 0 0 2px rgba(52,199,89,0.25);
 }
 
+/* ── widget head layout tweaks ── */
+.w-head { align-items: flex-start; }
+.w-head-text { flex: 1; min-width: 0; }
+.w-title-row { display: flex; align-items: flex-start; gap: 8px; }
+.w-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+
+/* ── "New" badge ── */
+.new-badge {
+  flex-shrink: 0;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(52,199,89,0.18);
+  color: rgba(52,199,89,1);
+  border: 1px solid rgba(52,199,89,0.3);
+}
+
+/* ── Star / save button ── */
+.star-btn {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.5);
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.star-btn:hover { background: rgba(255,200,0,0.12); color: rgba(255,200,0,0.9); border-color: rgba(255,200,0,0.2); }
+.star-btn.starred { background: rgba(255,200,0,0.15); color: rgba(255,200,0,1); border-color: rgba(255,200,0,0.3); }
+.star-btn.starred svg { fill: rgba(255,200,0,0.9); }
+.star-btn svg { width: 16px; height: 16px; }
+
+/* ── Hours row ── */
+.w-hours {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 6px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: -0.01em;
+}
+.w-hours[hidden] { display: none; }
+.w-hours svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ── Website / Instagram links ── */
+.w-links {
+  display: flex;
+  gap: 8px;
+  padding: 10px 6px 2px;
+  flex-wrap: wrap;
+}
+.w-links[hidden] { display: none; }
+.w-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.10);
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.w-link[hidden] { display: none; }
+.w-link:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.w-link svg { width: 12px; height: 12px; }
+
+/* ── Spin limit pill in sub ── */
+.spins-left-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.spins-left-pill.has-spins { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.55); }
+.spins-left-pill.no-spins { background: rgba(255,80,80,0.15); color: rgba(255,100,100,0.9); }
+
+/* ── Auth button in rail ── */
+.rail-btn.authed { color: rgba(52,199,89,0.9); }
+.rail-btn.authed:hover { background: rgba(52,199,89,0.08); }
+
+/* ── Auth modal ── */
+.auth-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.auth-modal[hidden] { display: none; }
+.auth-card {
+  position: relative;
+  width: 340px;
+  background: rgba(18,16,14,0.96);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+}
+.auth-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.5);
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background .15s;
+}
+.auth-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.auth-close svg { width: 13px; height: 13px; }
+.auth-logo {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f3f1ec, #d8d3c8);
+  display: grid; place-items: center;
+  color: #1a1a17;
+  margin-bottom: 16px;
+}
+.auth-logo svg { width: 24px; height: 24px; }
+.auth-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.auth-desc {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.auth-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.auth-input:focus { border-color: rgba(255,255,255,0.28); }
+.auth-input::placeholder { color: rgba(255,255,255,0.3); }
+.auth-submit {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.auth-submit:hover { background: rgba(255,255,255,0.18); }
+.auth-sent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(52,199,89,0.10);
+  border: 1px solid rgba(52,199,89,0.2);
+  color: rgba(52,199,89,0.9);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.auth-sent[hidden] { display: none; }
+.auth-sent svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+.auth-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+.auth-user[hidden] { display: none; }
+.auth-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,200,0,0.4), rgba(255,140,0,0.4));
+  display: grid; place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.auth-user-email {
+  flex: 1;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.auth-logout {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,100,100,0.8);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.auth-logout:hover { color: rgba(255,100,100,1); }
+
 /* primary CTA inside the widget — glass-native */
 .w-cta {
   margin-top: 14px;
