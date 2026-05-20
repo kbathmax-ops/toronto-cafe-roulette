@@ -53,19 +53,34 @@ body {
   padding: 18px 0;
   gap: 4px;
 }
-.rail-logo {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #f3f1ec, #d8d3c8);
-  display: grid; place-items: center;
-  margin-bottom: 18px;
-  color: #1a1a17;
-  box-shadow: 0 8px 24px rgba(255,255,255,0.08);
+.rail-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0 12px;
   cursor: pointer;
   transition: opacity .15s;
+  margin-bottom: 8px;
 }
-.rail-logo:hover { opacity: 0.85; }
-.rail-logo svg { width: 22px; height: 22px; }
+.rail-brand:hover { opacity: 0.8; }
+.rail-brand-icon {
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #f3f1ec, #d8d3c8);
+  display: grid; place-items: center;
+  color: #1a1a17;
+  box-shadow: 0 4px 16px rgba(255,255,255,0.1);
+}
+.rail-brand-icon svg { width: 22px; height: 22px; }
+.rail-brand-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-style: italic;
+  color: rgba(255,255,255,0.85);
+  line-height: 1;
+}
 .rail-btn {
   width: 48px;
   padding: 7px 0 6px;
@@ -127,12 +142,101 @@ body {
 }
 
 /* ========================================
+   IDLE HERO — full-stage spin/browse landing
+   ======================================== */
+.hero {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 420px;
+  max-width: calc(100vw - 80px);
+  text-align: center;
+}
+.hero-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hero-count {
+  font-size: 72px;
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  color: #fff;
+  line-height: 1;
+}
+.hero-count-unit {
+  font-size: 22px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: -0.02em;
+}
+.hero-city {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.hero-spin-btn {
+  flex: 1;
+  height: 54px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.13);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background .15s, transform .15s;
+}
+.hero-spin-btn svg { width: 17px; height: 17px; }
+.hero-spin-btn:hover { background: rgba(255,255,255,0.20); transform: translateY(-1px); }
+.hero-spin-btn:active { transform: translateY(0) scale(0.98); }
+.hero-browse-btn {
+  height: 54px;
+  padding: 0 22px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.65);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  white-space: nowrap;
+  transition: background .15s, color .15s, transform .15s;
+}
+.hero-browse-btn svg { width: 15px; height: 15px; }
+.hero-browse-btn:hover { background: rgba(255,255,255,0.12); color: #fff; transform: translateY(-1px); }
+.hero[hidden] { display: none; }
+
+/* ========================================
    GLASS WIDGET — centered card
    ======================================== */
 .widget {
   position: absolute;
   left: 50%; top: 50%;
-  transform: translate(-50%, calc(-50% - 28px));
+  transform: translate(-50%, calc(-50% - 20px));
   width: 460px;
   padding: 22px;
   border-radius: var(--card-radius);
@@ -142,10 +246,9 @@ body {
   box-shadow: var(--shadow);
   border: 1px solid var(--glass-edge);
   z-index: 10;
-  /* inner highlight to mimic Apple glass */
-  position: relative;
   isolation: isolate;
 }
+.widget[hidden] { display: none; }
 .widget::before {
   content: '';
   position: absolute; inset: 0;
@@ -871,15 +974,18 @@ body {
 }
 
 /* ========================================
-   Topographic spin visual
+   Topographic spin visual (stage-level, absolute center)
    ======================================== */
 .topo-wrap {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 12;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 110px;
-  margin: 8px 0;
 }
+.topo-wrap[hidden] { display: none; }
 .topo-cup {
   width: 100px; height: 100px;
   color: rgba(255,255,255,0.55);
