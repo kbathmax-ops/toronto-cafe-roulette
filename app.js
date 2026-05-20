@@ -15,9 +15,48 @@
   var RANK = { many: 3, some: 2, few: 1, good: 3, ok: 2, none: 0, unknown: 0,
                quiet: 1, moderate: 2, lively: 3 };
 
-  /* ===== System 7: laptop-friendly default filter ===== */
+  /* ===== Neighbourhood coordinates for Near Me ===== */
+  var HOOD_COORDS = {
+    "Annex": [43.669, -79.404], "Kensington Market": [43.655, -79.401],
+    "King West": [43.644, -79.397], "Financial District": [43.648, -79.382],
+    "Leslieville": [43.659, -79.337], "Riverdale": [43.663, -79.348],
+    "Junction": [43.663, -79.464], "Liberty Village": [43.638, -79.420],
+    "Yorkville": [43.671, -79.393], "Church-Wellesley": [43.665, -79.381],
+    "Distillery District": [43.650, -79.359], "Roncesvalles": [43.645, -79.450],
+    "Parkdale": [43.641, -79.441], "Bloorcourt": [43.662, -79.427],
+    "Koreatown": [43.663, -79.416], "Ossington": [43.648, -79.422],
+    "Harbourfront": [43.638, -79.384], "St. Lawrence": [43.650, -79.371],
+    "Corktown": [43.651, -79.364], "North York": [43.761, -79.411],
+    "Midtown": [43.692, -79.392], "Summerhill": [43.680, -79.390],
+    "Yonge & Eglinton": [43.706, -79.398], "St. Clair West": [43.686, -79.415],
+    "Junction Triangle": [43.656, -79.457], "Downtown": [43.652, -79.382],
+    "Queen West": [43.648, -79.416], "West Queen West": [43.645, -79.427],
+    "Trinity Bellwoods": [43.648, -79.420], "Bloor West Village": [43.649, -79.483],
+    "Etobicoke": [43.624, -79.513], "Chinatown": [43.652, -79.398],
+    "Little Italy": [43.657, -79.411], "Garden District": [43.656, -79.375],
+    "Moss Park": [43.654, -79.370], "Dovercourt": [43.666, -79.434],
+    "Scarborough (Birch Cliff)": [43.691, -79.268], "Canary District": [43.649, -79.355],
+  };
+
+  /* ===== Active filters ===== */
+  var activeFilters = { openNow: false, nearMe: false, area: null };
+
+  /* ===== System 7: pool with filters applied ===== */
   function pool() {
-    return ALL.filter(function (c) { return c.laptopFriendly !== false; });
+    var p = ALL.filter(function (c) { return c.laptopFriendly !== false; });
+    if (activeFilters.openNow) {
+      var h = new Date().getHours();
+      var lateNight = h >= 22 || h < 7;
+      if (lateNight) {
+        p = p.filter(function (c) {
+          return c.vibe && (c.vibe.indexOf("24") >= 0 || c.vibe.indexOf("11pm") >= 0);
+        });
+      }
+    }
+    if (activeFilters.area) {
+      p = p.filter(function (c) { return c.neighborhood === activeFilters.area; });
+    }
+    return p;
   }
 
   /* tile icons (match Roast widget-tile weight: stroke 1.6) */
@@ -91,7 +130,8 @@
     var sp = spinsToday();
     $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span id="w-sub-tail"></span>';
     $("w-sub-tail").textContent = sp ? sp + (sp === 1 ? " spin today" : " spins today") : "Tonight";
-    IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, t.lbl, t.val, t.small); });
+    $("w-grid").hidden = true;
+    $("filter-chips").hidden = false;
     $("w-desc").textContent = IDLE.desc;
     $("w-cta-label").textContent = "Match me";
     poolCount();
@@ -99,6 +139,8 @@
 
   /* ===== System 4: result rendering (repurpose existing widget elements) ===== */
   function showResult(c) {
+    $("w-grid").hidden = false;
+    $("filter-chips").hidden = true;
     $("w-title").textContent = c.name;
     var loc = c.neighborhood + (c.address ? " · " + c.address : "");
     $("w-sub").innerHTML = '<span></span>' + (c.mine ? ' <span class="dot">·</span> <span></span>' : "");
@@ -119,11 +161,12 @@
   }
 
   function showEmpty() {
-    $("w-title").textContent = "No cafes match tonight.";
+    $("w-title").textContent = "No cafes match.";
     $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span></span>';
-    $("w-sub").lastChild.textContent = "pool is empty";
-    IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, "—", "—", ""); });
-    $("w-desc").textContent = "Every spot is filtered out. Tap the dock to reset.";
+    $("w-sub").lastChild.textContent = "adjust your filters";
+    $("w-grid").hidden = true;
+    $("filter-chips").hidden = false;
+    $("w-desc").textContent = "Every spot is filtered out. Tap the dock to reset filters.";
     $("w-num").textContent = "0";
   }
 
@@ -135,10 +178,10 @@
     spinning = true;
     triggers.forEach(function (el) { if (el) el.classList.add("spinning"); });
     $("topo-wrap").hidden = false;
-    $("w-grid").style.visibility = "hidden";
+    $("w-grid").hidden = true;
+    $("filter-chips").hidden = true;
     $("w-desc").textContent = "Spinning the wheel…";
     $("w-cta-label").textContent = "Matching…";
-    IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, t.lbl, "·", ""); });
 
     var ticks = 14 + Math.floor(Math.random() * 6), i = 0;
     clearTimeout(spinTimer);
@@ -148,7 +191,6 @@
         spinning = false;
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
         $("topo-wrap").hidden = true;
-        $("w-grid").style.visibility = "";
         showResult(p[Math.floor(Math.random() * p.length)]);
         bumpSpins();
         return;
@@ -227,12 +269,106 @@
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
     $("topo-wrap").hidden = true;
-    $("w-grid").style.visibility = "";
+    activeFilters.openNow = false; activeFilters.nearMe = false; activeFilters.area = null;
+    $("fc-open").classList.remove("active");
+    $("fc-near").classList.remove("active");
+    $("fc-area").classList.remove("active");
+    $("fc-area-label").textContent = "By area";
+    $("area-picker").hidden = true;
     closeGrid();
     showIdle();
   });
   $("rail-grid").addEventListener("click", openGrid);
   $("cgp-close").addEventListener("click", closeGrid);
+
+  /* ===== Home rail button resets to idle ===== */
+  $("rail-home").addEventListener("click", function () {
+    closeGrid();
+    $("topo-wrap").hidden = true;
+    showIdle();
+  });
+
+  /* ===== Filters ===== */
+  function updateFilters() { poolCount(); }
+
+  /* Open now */
+  $("fc-open").addEventListener("click", function () {
+    activeFilters.openNow = !activeFilters.openNow;
+    this.classList.toggle("active", activeFilters.openNow);
+    updateFilters();
+  });
+
+  /* Near me */
+  $("fc-near").addEventListener("click", function () {
+    var chip = this;
+    if (activeFilters.nearMe) {
+      activeFilters.nearMe = false;
+      activeFilters.area = null;
+      chip.classList.remove("active");
+      $("fc-area-label").textContent = "By area";
+      $("fc-area").classList.remove("active");
+      updateFilters();
+      return;
+    }
+    if (!navigator.geolocation) { return; }
+    chip.classList.add("loading");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      chip.classList.remove("loading");
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      var best = null, bestDist = Infinity;
+      Object.keys(HOOD_COORDS).forEach(function (h) {
+        var c = HOOD_COORDS[h];
+        var d = Math.pow(c[0] - lat, 2) + Math.pow(c[1] - lng, 2);
+        if (d < bestDist) { bestDist = d; best = h; }
+      });
+      if (best) {
+        activeFilters.nearMe = true;
+        activeFilters.area = best;
+        chip.classList.add("active");
+        $("fc-area-label").textContent = best;
+        $("fc-area").classList.add("active");
+        updateFilters();
+      }
+    }, function () { chip.classList.remove("loading"); });
+  });
+
+  /* By area — build picker once, toggle dropdown */
+  (function () {
+    var picker = $("area-picker");
+    var hoods = {};
+    ALL.forEach(function (c) { if (c.neighborhood) hoods[c.neighborhood] = true; });
+    picker.innerHTML = Object.keys(hoods).sort().map(function (h) {
+      return '<button class="area-btn" data-hood="' + h + '">' + h + '</button>';
+    }).join("");
+
+    $("fc-area").addEventListener("click", function (e) {
+      if (activeFilters.nearMe) return; // near-me owns the area filter
+      picker.hidden = !picker.hidden;
+    });
+
+    picker.addEventListener("click", function (e) {
+      var btn = e.target.closest(".area-btn");
+      if (!btn) return;
+      var hood = btn.dataset.hood;
+      picker.querySelectorAll(".area-btn").forEach(function (b) { b.classList.remove("selected"); });
+      if (activeFilters.area === hood) {
+        activeFilters.area = null;
+        $("fc-area-label").textContent = "By area";
+        $("fc-area").classList.remove("active");
+      } else {
+        activeFilters.area = hood;
+        btn.classList.add("selected");
+        $("fc-area-label").textContent = hood;
+        $("fc-area").classList.add("active");
+      }
+      picker.hidden = true;
+      updateFilters();
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".filter-chip-wrap")) picker.hidden = true;
+    });
+  }());
 
   $("f-expand").addEventListener("click", function () {
     var el = document.documentElement;
@@ -242,13 +378,6 @@
   document.addEventListener("keydown", function (e) {
     if (e.code === "Space") { e.preventDefault(); doSpin(); }
   });
-
-  /* OS clock (matches prototype) */
-  function tickClock() {
-    $("os-time").textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-  }
-  tickClock();
-  setInterval(tickClock, 30000);
 
   showIdle();
 })();
