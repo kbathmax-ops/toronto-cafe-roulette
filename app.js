@@ -408,7 +408,6 @@
     showIdle(); /* shows hero, hides widget */
   }
   $("rail-logo").addEventListener("click", goHome);
-  $("rail-home").addEventListener("click", goHome);
 
   /* ===== Filters ===== */
   function updateFilters() { poolCount(); }
