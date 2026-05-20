@@ -113,8 +113,8 @@
 
   function poolCount() {
     var n = pool().length;
-    $("w-num").textContent = n;
-    $("w-unit").textContent = "spots";
+    if ($("w-num")) $("w-num").textContent = n;
+    if ($("hero-num")) $("hero-num").textContent = n;
   }
 
   /* ===== System 6: spins-today counter + 5/day limit ===== */
@@ -202,14 +202,8 @@
   function showIdle() {
     currentCafe = null;
     try { history.pushState("", document.title, window.location.pathname); } catch (e) {}
-    $("w-title").textContent = IDLE.title;
-    var sp = spinsToday();
-    $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span id="w-sub-tail"></span>';
-    $("w-sub-tail").textContent = sp ? sp + (sp === 1 ? " spin today" : " spins today") : "Tonight";
-    $("w-grid").hidden = true;
-    $("filter-chips").hidden = false;
-    $("w-desc").textContent = IDLE.desc;
-    $("w-cta-label").textContent = "Match me";
+    $("hero").hidden = false;
+    $("widget").hidden = true;
     $("new-badge").hidden = true;
     $("star-btn").hidden = true;
     $("w-hours").hidden = true;
@@ -217,13 +211,14 @@
     poolCount();
   }
 
-  /* ===== System 4: result rendering (repurpose existing widget elements) ===== */
+  /* ===== System 4: result rendering ===== */
   function showResult(c) {
     currentCafe = c;
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
 
+    $("hero").hidden = true;
+    $("widget").hidden = false;
     $("w-grid").hidden = false;
-    $("filter-chips").hidden = true;
     $("w-title").textContent = c.name;
     var loc = c.neighborhood + (c.address ? " · " + c.address : "");
     $("w-sub").innerHTML = '<span></span>' + (c.mine ? ' <span class="dot">·</span> <span></span>' : "");
@@ -275,40 +270,39 @@
   }
 
   function showEmpty() {
-    $("w-title").textContent = "No cafes match.";
-    $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span></span>';
-    $("w-sub").lastChild.textContent = "adjust your filters";
-    $("w-grid").hidden = true;
-    $("filter-chips").hidden = false;
-    $("w-desc").textContent = "Every spot is filtered out. Tap the dock to reset filters.";
-    $("w-num").textContent = "0";
+    $("hero").hidden = false;
+    $("widget").hidden = true;
+    if ($("hero-num")) $("hero-num").textContent = "0";
   }
 
   /* ===== System 3: roulette spin (quadratic deceleration) ===== */
   function spin(triggers) {
     if (spinning) return;
     if (spinsLeft() === 0) {
-      $("w-title").textContent = "You've had your 5 coffees today.";
-      $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span>come back tomorrow</span>';
-      $("w-desc").textContent = "Daily spin limit reached. Browse and favourites still work!";
+      $("hero").hidden = true;
+      $("widget").hidden = false;
       $("w-grid").hidden = true;
-      $("filter-chips").hidden = true;
+      $("w-title").textContent = "5 coffees today — nice.";
+      $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span>come back tomorrow</span>';
+      $("w-desc").textContent = "Daily spin limit reached. Browse all cafes or tap the dock to go home.";
+      $("w-cta-label").textContent = "Browse all";
+      $("star-btn").hidden = true;
+      $("w-hours").hidden = true;
+      $("w-links").hidden = true;
+      $("new-badge").hidden = true;
       return;
     }
     var p = pool();
     if (!p.length) { showEmpty(); return; }
     spinning = true;
     triggers.forEach(function (el) { if (el) el.classList.add("spinning"); });
+    $("hero").hidden = true;
+    $("widget").hidden = true;
     $("topo-wrap").hidden = false;
-    $("w-grid").hidden = true;
-    $("filter-chips").hidden = true;
-    $("w-desc").textContent = "Spinning the wheel…";
-    $("w-cta-label").textContent = "Matching…";
 
     var ticks = 14 + Math.floor(Math.random() * 6), i = 0;
     clearTimeout(spinTimer);
     function tick() {
-      $("w-title").textContent = p[Math.floor(Math.random() * p.length)].name;
       if (++i >= ticks) {
         spinning = false;
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
@@ -381,12 +375,14 @@
     $("rail-grid").classList.remove("active");
   }
 
-  /* ===== wire interactions onto existing (unchanged) elements ===== */
+  /* ===== wire interactions ===== */
   var spinBtns = [$("f-spin"), $("rail-spin")];
   function doSpin() { spin(spinBtns); }
   $("f-spin").addEventListener("click", doSpin);
   $("rail-spin").addEventListener("click", doSpin);
   $("w-cta").addEventListener("click", doSpin);
+  $("hero-spin").addEventListener("click", doSpin);
+  $("hero-browse").addEventListener("click", openGrid);
   $("dock").addEventListener("click", function () {
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
@@ -398,7 +394,7 @@
     $("fc-area-label").textContent = "By area";
     $("area-picker").hidden = true;
     closeGrid();
-    showIdle();
+    showIdle(); /* shows hero, hides widget */
   });
   $("rail-grid").addEventListener("click", openGrid);
   $("cgp-close").addEventListener("click", closeGrid);
@@ -409,7 +405,7 @@
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
     $("topo-wrap").hidden = true;
     closeGrid();
-    showIdle();
+    showIdle(); /* shows hero, hides widget */
   }
   $("rail-logo").addEventListener("click", goHome);
   $("rail-home").addEventListener("click", goHome);
