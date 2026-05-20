@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roast — Toronto Cafe Roulette</title>
-<meta name="description" content="Spin for a Toronto cafe to work from — outlets, wifi, lighting, noise. A coffee chat roulette over the city's best cafes.">
+<title>caffein — Toronto cafe finder</title>
+<meta name="description" content="Find a Toronto cafe to work from. Filter by open now, near me, or by neighbourhood. Spin the wheel.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,18 +19,22 @@
           <path d="M7 5c0 1.5-1 1.5-1 3M11 5c0 1.5-1 1.5-1 3"/>
         </svg>
       </div>
-      <button class="rail-btn active" title="Home">
+      <button class="rail-btn active" id="rail-home" title="Home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h12v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M17 11h2a2 2 0 0 1 0 4h-2"/><path d="M7 5c0 1.5-1 1.5-1 3M11 5c0 1.5-1 1.5-1 3"/></svg>
+        <span class="rail-label">Home</span>
       </button>
       <button class="rail-btn" id="rail-spin" title="Spin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+        <span class="rail-label">Spin</span>
       </button>
       <button class="rail-btn" id="rail-grid" title="All cafes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="rail-label">Browse</span>
       </button>
       <div class="rail-spacer"></div>
       <button class="rail-btn" title="Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        <span class="rail-label">Settings</span>
       </button>
       <div class="rail-dot" title="412 online"></div>
     </aside>
@@ -39,7 +43,7 @@
     <main class="stage">
       <div class="bg-img"></div>
 
-      <div class="os-time" id="os-time">00:00</div>
+      <div class="brand">caffein</div>
       <div class="os-status">
         <span class="live"><span class="pulse"></span> <span id="os-online">412</span> online</span>
       </div>
@@ -56,6 +60,24 @@
             <span class="unit" id="w-unit">spots</span>
           </div>
         </header>
+
+        <div class="filter-chips" id="filter-chips">
+          <button class="filter-chip" id="fc-open" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            Open now
+          </button>
+          <button class="filter-chip" id="fc-near" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Near me
+          </button>
+          <div class="filter-chip-wrap">
+            <button class="filter-chip" id="fc-area" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+              <span id="fc-area-label">By area</span>
+            </button>
+            <div class="area-picker" id="area-picker" hidden></div>
+          </div>
+        </div>
 
         <div class="topo-wrap" id="topo-wrap" hidden>
           <svg class="topo-cup" id="topo-cup" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true">
