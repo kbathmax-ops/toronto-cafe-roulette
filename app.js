@@ -134,6 +134,8 @@
     if (!p.length) { showEmpty(); return; }
     spinning = true;
     triggers.forEach(function (el) { if (el) el.classList.add("spinning"); });
+    $("topo-wrap").hidden = false;
+    $("w-grid").style.visibility = "hidden";
     $("w-desc").textContent = "Spinning the wheel…";
     $("w-cta-label").textContent = "Matching…";
     IDLE.tiles.forEach(function (t, i) { setTile(i, t.svg, t.lbl, "·", ""); });
@@ -145,6 +147,8 @@
       if (++i >= ticks) {
         spinning = false;
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
+        $("topo-wrap").hidden = true;
+        $("w-grid").style.visibility = "";
         showResult(p[Math.floor(Math.random() * p.length)]);
         bumpSpins();
         return;
@@ -163,6 +167,8 @@
   $("dock").addEventListener("click", function () {
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
+    $("topo-wrap").hidden = true;
+    $("w-grid").style.visibility = "";
     showIdle();
   });
   $("f-expand").addEventListener("click", function () {

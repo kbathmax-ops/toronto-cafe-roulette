@@ -414,7 +414,53 @@ body {
 .f-btn:active, .dock:active { transform: translateY(0) scale(0.97); }
 .rail-btn:active, .tile:active { transform: scale(0.97); }
 
+/* ========================================
+   Topographic spin visual
+   ======================================== */
+.topo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 110px;
+  margin: 8px 0;
+}
+.topo-cup {
+  width: 100px; height: 100px;
+  color: rgba(255,255,255,0.55);
+  animation: topo-spin 0.38s linear infinite;
+  will-change: transform;
+}
+@keyframes topo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Mobile responsive
+   ======================================== */
+@media (max-width: 640px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .rail {
+    display: none;
+  }
+  .widget {
+    width: min(460px, calc(100vw - 32px));
+  }
+  .w-head .num {
+    font-size: 40px;
+  }
+  .w-head h1 {
+    font-size: 18px;
+    max-width: none;
+  }
+  .os-time {
+    font-size: 17px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .f-btn.spinning, .rail-btn.spinning { animation: none; }
+  .topo-cup { animation: none; }
   * { transition-duration: 0.01ms !important; }
 }
