@@ -281,12 +281,16 @@
   $("rail-grid").addEventListener("click", openGrid);
   $("cgp-close").addEventListener("click", closeGrid);
 
-  /* ===== Home rail button resets to idle ===== */
-  $("rail-home").addEventListener("click", function () {
-    closeGrid();
+  /* ===== Logo + Home rail button both reset to idle ===== */
+  function goHome() {
+    if (spinning) { clearTimeout(spinTimer); spinning = false;
+      spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
     $("topo-wrap").hidden = true;
+    closeGrid();
     showIdle();
-  });
+  }
+  $("rail-logo").addEventListener("click", goHome);
+  $("rail-home").addEventListener("click", goHome);
 
   /* ===== Filters ===== */
   function updateFilters() { poolCount(); }
