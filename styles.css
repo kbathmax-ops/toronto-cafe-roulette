@@ -153,9 +153,18 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  width: 420px;
-  max-width: calc(100vw - 80px);
+  width: min(560px, calc(100vw - 80px));
   text-align: center;
+}
+.hero-title {
+  font-size: clamp(72px, 14vw, 200px);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  font-style: italic;
+  color: #fff;
+  line-height: 0.88;
+  user-select: none;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.4);
 }
 .hero-top {
   display: flex;
