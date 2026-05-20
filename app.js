@@ -198,12 +198,17 @@
     updateStarBtn(k);
   }
 
+  function showView(v) { /* v: "idle" | "spinning" | "result" */
+    $("hero-idle").hidden    = v !== "idle";
+    $("hero-spinning").hidden = v !== "spinning";
+    $("hero-result").hidden  = v !== "result";
+  }
+
   /* ===== idle / reset ===== */
   function showIdle() {
     currentCafe = null;
     try { history.pushState("", document.title, window.location.pathname); } catch (e) {}
-    $("hero").hidden = false;
-    $("widget").hidden = true;
+    showView("idle");
     $("new-badge").hidden = true;
     $("star-btn").hidden = true;
     $("w-hours").hidden = true;
@@ -216,8 +221,7 @@
     currentCafe = c;
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
 
-    $("hero").hidden = true;
-    $("widget").hidden = false;
+    showView("result");
     $("w-grid").hidden = false;
     $("w-title").textContent = c.name;
     var loc = c.neighborhood + (c.address ? " · " + c.address : "");
@@ -270,8 +274,7 @@
   }
 
   function showEmpty() {
-    $("hero").hidden = false;
-    $("widget").hidden = true;
+    showView("idle");
     if ($("hero-num")) $("hero-num").textContent = "0";
   }
 
@@ -279,12 +282,11 @@
   function spin(triggers) {
     if (spinning) return;
     if (spinsLeft() === 0) {
-      $("hero").hidden = true;
-      $("widget").hidden = false;
+      showView("result");
       $("w-grid").hidden = true;
       $("w-title").textContent = "5 coffees today — nice.";
       $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span>come back tomorrow</span>';
-      $("w-desc").textContent = "Daily spin limit reached. Browse all cafes or tap the dock to go home.";
+      $("w-desc").textContent = "Daily spin limit reached. Browse all or tap the dock to go home.";
       $("w-cta-label").textContent = "Browse all";
       $("star-btn").hidden = true;
       $("w-hours").hidden = true;
@@ -296,17 +298,15 @@
     if (!p.length) { showEmpty(); return; }
     spinning = true;
     triggers.forEach(function (el) { if (el) el.classList.add("spinning"); });
-    $("hero").hidden = true;
-    $("widget").hidden = true;
-    $("topo-wrap").hidden = false;
+    showView("spinning");
 
     var ticks = 14 + Math.floor(Math.random() * 6), i = 0;
     clearTimeout(spinTimer);
     function tick() {
+      $("spin-name").textContent = p[Math.floor(Math.random() * p.length)].name;
       if (++i >= ticks) {
         spinning = false;
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
-        $("topo-wrap").hidden = true;
         showResult(p[Math.floor(Math.random() * p.length)]);
         bumpSpins();
         return;
@@ -386,7 +386,6 @@
   $("dock").addEventListener("click", function () {
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
-    $("topo-wrap").hidden = true;
     activeFilters.openNow = false; activeFilters.nearMe = false; activeFilters.area = null;
     $("fc-open").classList.remove("active");
     $("fc-near").classList.remove("active");
@@ -403,9 +402,9 @@
   function goHome() {
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
-    $("topo-wrap").hidden = true;
     closeGrid();
-    showIdle(); /* shows hero, hides widget */
+    if ($("map-panel")) { $("map-panel").hidden = true; $("rail-map").classList.remove("active"); }
+    showIdle();
   }
   $("rail-logo").addEventListener("click", goHome);
 
@@ -548,6 +547,94 @@
   $("star-btn").addEventListener("click", function () {
     if (currentCafe) toggleFav(currentCafe);
   });
+
+  /* ===== Map ===== */
+  var cafeinMap = null;
+  function initMap() {
+    if (cafeinMap || typeof L === "undefined") return;
+    $("map-count").textContent = ALL.length + " spots";
+    cafeinMap = L.map("map-container", { center: [43.655, -79.385], zoom: 13, zoomControl: true });
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
+      maxZoom: 19
+    }).addTo(cafeinMap);
+    var icon = L.divIcon({ className: "map-pin", html: '<div class="map-pin-dot"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
+    ALL.forEach(function (c) {
+      var coord = HOOD_COORDS[c.neighborhood];
+      if (!coord) return;
+      var jLat = coord[0] + (Math.random() - 0.5) * 0.0025;
+      var jLng = coord[1] + (Math.random() - 0.5) * 0.0035;
+      var m = L.marker([jLat, jLng], { icon: icon });
+      m.bindPopup(
+        '<strong>' + c.name + '</strong>' +
+        (c.neighborhood ? '<br><span style="opacity:.6">' + c.neighborhood + '</span>' : '') +
+        (c.hours ? '<br><span style="opacity:.55">⏱ ' + c.hours + '</span>' : '')
+      );
+      m.on("click", function () {
+        $("map-panel").hidden = true;
+        $("rail-map").classList.remove("active");
+        showResult(c);
+      });
+      m.addTo(cafeinMap);
+    });
+  }
+  function openMap() {
+    $("map-panel").hidden = false;
+    $("rail-map").classList.add("active");
+    setTimeout(function () { initMap(); if (cafeinMap) cafeinMap.invalidateSize(); }, 60);
+  }
+  function closeMap() {
+    $("map-panel").hidden = true;
+    $("rail-map").classList.remove("active");
+  }
+  $("rail-map").addEventListener("click", openMap);
+  $("map-close").addEventListener("click", closeMap);
+
+  /* add map-pin CSS dynamically */
+  (function () {
+    var s = document.createElement("style");
+    s.textContent = ".map-pin-dot{width:12px;height:12px;border-radius:50%;background:#1a1a17;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);}";
+    document.head.appendChild(s);
+  }());
+
+  /* ===== Suggest a cafe ===== */
+  (function () {
+    var hoods = {};
+    ALL.forEach(function (c) { if (c.neighborhood) hoods[c.neighborhood] = true; });
+    var sel = $("sug-hood");
+    Object.keys(hoods).sort().forEach(function (h) {
+      var o = document.createElement("option");
+      o.value = h; o.textContent = h;
+      sel.appendChild(o);
+    });
+
+    function openSuggest() { $("suggest-modal").hidden = false; $("suggest-form").hidden = false; $("suggest-sent").hidden = true; $("sug-name").value = ""; }
+    function closeSuggest() { $("suggest-modal").hidden = true; }
+    $("suggest-open").addEventListener("click", openSuggest);
+    $("rail-add").addEventListener("click", openSuggest);
+    $("suggest-close").addEventListener("click", closeSuggest);
+    $("suggest-modal").addEventListener("click", function (e) { if (e.target === $("suggest-modal")) closeSuggest(); });
+
+    $("sug-submit").addEventListener("click", function () {
+      var name = $("sug-name").value.trim();
+      if (!name) { $("sug-name").focus(); return; }
+      var payload = {
+        name: name,
+        neighborhood: $("sug-hood").value || null,
+        website: $("sug-web").value.trim() || null,
+        instagram: $("sug-ig").value.trim().replace(/^@/, "") || null,
+        notes: $("sug-notes").value.trim() || null
+      };
+      if (sb) {
+        sb.from("caffein_submissions").insert(payload).then(function (res) {
+          if (!res.error) { $("suggest-form").hidden = true; $("suggest-sent").hidden = false; }
+        });
+      } else {
+        $("suggest-form").hidden = true;
+        $("suggest-sent").hidden = false;
+      }
+    });
+  }());
 
   /* ===== Init: restore from hash or show idle ===== */
   if (!loadFromHash()) showIdle();

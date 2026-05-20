@@ -6,7 +6,9 @@
 <title>caffein — Toronto cafe finder</title>
 <meta name="description" content="Find a Toronto cafe to work from. Filter by open now, near me, or by neighbourhood. Spin the wheel.">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 <div id="root">
@@ -31,6 +33,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         <span class="rail-label">Browse</span>
       </button>
+      <button class="rail-btn" id="rail-map" title="Map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+        <span class="rail-label">Map</span>
+      </button>
+      <button class="rail-btn" id="rail-add" title="Suggest a cafe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+        <span class="rail-label">Add</span>
+      </button>
       <div class="rail-spacer"></div>
       <button class="rail-btn" id="rail-auth" title="Sign in">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -47,113 +57,106 @@
     <main class="stage">
       <div class="bg-img"></div>
 
-      <!-- IDLE HERO — spin + browse landing -->
-      <div class="hero" id="hero">
-        <h1 class="hero-title">caffein</h1>
-        <div class="hero-top">
-          <span class="hero-count"><span id="hero-num">110</span><span class="hero-count-unit"> spots</span></span>
-          <span class="hero-city">Toronto, ON</span>
-        </div>
-        <div class="filter-chips" id="filter-chips">
-          <button class="filter-chip" id="fc-open" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            Open now
-          </button>
-          <button class="filter-chip" id="fc-near" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            Near me
-          </button>
-          <div class="filter-chip-wrap">
-            <button class="filter-chip" id="fc-area" type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
-              <span id="fc-area-label">By area</span>
-            </button>
-            <div class="area-picker" id="area-picker" hidden></div>
+      <!-- UNIFIED HERO — three in-place views -->
+      <div class="hero" id="hero" aria-live="polite">
+
+        <!-- VIEW 1: idle -->
+        <div id="hero-idle">
+          <h1 class="hero-title">caffein</h1>
+          <div class="hero-top">
+            <span class="hero-count"><span id="hero-num">110</span><span class="hero-count-unit"> spots</span></span>
+            <span class="hero-city">Toronto, ON</span>
           </div>
+          <div class="filter-chips" id="filter-chips">
+            <button class="filter-chip" id="fc-open" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              Open now
+            </button>
+            <button class="filter-chip" id="fc-near" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              Near me
+            </button>
+            <div class="filter-chip-wrap">
+              <button class="filter-chip" id="fc-area" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+                <span id="fc-area-label">By area</span>
+              </button>
+              <div class="area-picker" id="area-picker" hidden></div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="hero-spin-btn" id="hero-spin">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M21 21l-5.6-5.6"/><path d="M18.5 3l.6 1.9L21 5.5l-1.9.6L18.5 8l-.6-1.9L16 5.5l1.9-.6z" fill="currentColor"/></svg>
+              Spin for a cafe
+            </button>
+            <button class="hero-browse-btn" id="hero-browse">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              Browse all
+            </button>
+          </div>
+          <button class="suggest-link" id="suggest-open">+ Suggest a spot</button>
         </div>
-        <div class="hero-actions">
-          <button class="hero-spin-btn" id="hero-spin">
+
+        <!-- VIEW 2: spinning -->
+        <div id="hero-spinning" hidden>
+          <div class="topo-wrap" id="topo-wrap">
+            <svg class="topo-cup" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true">
+              <ellipse cx="45" cy="50" rx="38" ry="35"/>
+              <ellipse cx="45" cy="50" rx="28" ry="26"/>
+              <ellipse cx="45" cy="50" rx="20" ry="18"/>
+              <ellipse cx="45" cy="50" rx="12" ry="11"/>
+              <ellipse cx="45" cy="50" rx="5"  ry="4"/>
+              <path d="M83 36 Q104 50 83 64"/>
+              <path d="M83 42 Q97 50 83 58"/>
+            </svg>
+          </div>
+          <p class="spin-name" id="spin-name">Finding your cafe…</p>
+        </div>
+
+        <!-- VIEW 3: result -->
+        <div id="hero-result" class="result-card" hidden>
+          <div class="w-head">
+            <div class="w-head-text">
+              <div class="w-title-row">
+                <h1 id="w-title"></h1>
+                <span class="new-badge" id="new-badge" hidden>New</span>
+              </div>
+              <div class="sub" id="w-sub"></div>
+            </div>
+            <div class="w-head-right">
+              <button class="star-btn" id="star-btn" title="Save this cafe" hidden aria-label="Save cafe">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="w-grid" id="w-grid">
+            <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
+            <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
+            <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
+            <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
+          </div>
+          <div class="w-hours" id="w-hours" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span id="w-hours-text"></span>
+          </div>
+          <div class="w-links" id="w-links" hidden>
+            <a class="w-link" id="w-link-web" href="#" target="_blank" rel="noopener noreferrer" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+              Website
+            </a>
+            <a class="w-link" id="w-link-ig" href="#" target="_blank" rel="noopener noreferrer" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              Instagram
+            </a>
+          </div>
+          <p class="w-desc" id="w-desc"></p>
+          <button class="w-cta" id="w-cta">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M21 21l-5.6-5.6"/><path d="M18.5 3l.6 1.9L21 5.5l-1.9.6L18.5 8l-.6-1.9L16 5.5l1.9-.6z" fill="currentColor"/></svg>
-            Spin for a cafe
-          </button>
-          <button class="hero-browse-btn" id="hero-browse">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            Browse all
+            <span id="w-cta-label">Match again</span>
           </button>
         </div>
+
       </div>
-
-      <!-- Topographic cup (shown during spin, stage-level) -->
-      <div class="topo-wrap" id="topo-wrap" hidden>
-        <svg class="topo-cup" id="topo-cup" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true">
-          <ellipse cx="45" cy="50" rx="38" ry="35"/>
-          <ellipse cx="45" cy="50" rx="28" ry="26"/>
-          <ellipse cx="45" cy="50" rx="20" ry="18"/>
-          <ellipse cx="45" cy="50" rx="12" ry="11"/>
-          <ellipse cx="45" cy="50" rx="5"  ry="4"/>
-          <path d="M83 36 Q104 50 83 64"/>
-          <path d="M83 42 Q97 50 83 58"/>
-        </svg>
-      </div>
-
-      <!-- GLASS WIDGET (result surface only) -->
-      <section class="widget" id="widget" hidden aria-label="Cafe result" aria-live="polite">
-        <header class="w-head">
-          <div class="w-head-text">
-            <div class="w-title-row">
-              <h1 id="w-title"></h1>
-              <span class="new-badge" id="new-badge" hidden>New</span>
-            </div>
-            <div class="sub" id="w-sub"></div>
-          </div>
-          <div class="w-head-right">
-            <div class="stat">
-              <span class="num" id="w-num">110</span>
-              <span class="unit" id="w-unit">spots</span>
-            </div>
-            <button class="star-btn" id="star-btn" title="Save this cafe" hidden aria-label="Save cafe">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
-            </button>
-          </div>
-        </header>
-
-        <div class="w-grid" id="w-grid">
-          <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
-          <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
-          <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
-          <div class="tile"><div class="label"><span class="lbl"></span></div><div class="value"><span class="val"></span></div></div>
-        </div>
-
-        <div class="w-hours" id="w-hours" hidden>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <span id="w-hours-text"></span>
-        </div>
-
-        <div class="w-links" id="w-links" hidden>
-          <a class="w-link" id="w-link-web" href="#" target="_blank" rel="noopener noreferrer" hidden>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-            Website
-          </a>
-          <a class="w-link" id="w-link-ig" href="#" target="_blank" rel="noopener noreferrer" hidden>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            Instagram
-          </a>
-        </div>
-
-        <p class="w-desc" id="w-desc">
-          Pair with a stranger over coffee in walking distance. Choose your vibe,
-          spin the wheel, and we'll book a quiet table for two.
-        </p>
-
-        <button class="w-cta" id="w-cta" title="Match me with a cafe">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="10.5" cy="10.5" r="6.5"/>
-            <path d="M21 21l-5.6-5.6"/>
-            <path d="M18.5 3l.6 1.9L21 5.5l-1.9.6L18.5 8l-.6-1.9L16 5.5l1.9-.6z" fill="currentColor"/>
-          </svg>
-          <span id="w-cta-label">Match me</span>
-        </button>
-      </section>
 
       <!-- bottom-center dock -->
       <button class="dock" id="dock" title="Reset">
@@ -197,6 +200,43 @@
           </button>
         </div>
         <div class="cgp-grid" id="cgp-grid"></div>
+      </div>
+
+      <!-- map panel -->
+      <div class="cafe-grid-panel" id="map-panel" hidden>
+        <div class="cgp-header">
+          <span class="cgp-title">Map</span>
+          <span class="cgp-count" id="map-count"></span>
+          <button class="cgp-close" id="map-close" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="map-container"></div>
+      </div>
+
+      <!-- suggest a cafe modal -->
+      <div class="auth-modal" id="suggest-modal" hidden>
+        <div class="auth-card suggest-card">
+          <button class="auth-close" id="suggest-close" title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+          <h2 class="auth-title">Suggest a spot</h2>
+          <p class="auth-desc">Know a great Toronto cafe we're missing? Tell us about it.</p>
+          <div id="suggest-form">
+            <input class="auth-input" id="sug-name" type="text" placeholder="Cafe name *" required>
+            <select class="auth-input sug-select" id="sug-hood">
+              <option value="">Neighbourhood (optional)</option>
+            </select>
+            <input class="auth-input" id="sug-web" type="url" placeholder="Website (optional)">
+            <input class="auth-input" id="sug-ig" type="text" placeholder="Instagram handle (optional)">
+            <textarea class="auth-input sug-notes" id="sug-notes" placeholder="Any notes — hours, vibe, laptop policy…" rows="2"></textarea>
+            <button class="auth-submit" id="sug-submit">Submit spot</button>
+          </div>
+          <div class="auth-sent" id="suggest-sent" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4z"/></svg>
+            <p>Thanks! We'll review it and add it soon.</p>
+          </div>
+        </div>
       </div>
 
       <!-- floating square glass buttons (bottom right) -->
