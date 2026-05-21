@@ -311,16 +311,8 @@
   function spin(triggers) {
     if (spinning) return;
     if (spinsLeft() === 0) {
-      showView("result");
-      $("w-grid").hidden = true;
-      $("w-title").textContent = "5 coffees today — nice.";
-      $("w-sub").innerHTML = 'Toronto, ON <span class="dot">·</span> <span>come back tomorrow</span>';
-      $("w-desc").textContent = "Daily spin limit reached. Browse all or tap the dock to go home.";
-      $("w-cta-label").textContent = "Browse all";
-      $("star-btn").hidden = true;
-      $("w-hours").hidden = true;
-      $("w-links").hidden = true;
-      $("new-badge").hidden = true;
+      $("spin-name").textContent = "5 coffees today — come back tomorrow";
+      showView("spinning");
       return;
     }
     var p = pool();
