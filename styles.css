@@ -1439,6 +1439,99 @@ body {
   }
 }
 
+/* ========================================
+   Settings modal
+   ======================================== */
+.settings-card {
+  width: 340px;
+  gap: 0;
+}
+.settings-section {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.settings-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 10px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+.settings-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.2;
+}
+.settings-sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.36);
+  margin-top: 2px;
+}
+.settings-btn {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.75);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out), transform 140ms var(--ease-out);
+}
+.settings-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.settings-btn:active { transform: scale(0.96); }
+.settings-btn-danger { color: rgba(255,100,80,0.8); border-color: rgba(255,100,80,0.18); }
+.settings-btn-danger:hover { background: rgba(255,100,80,0.12); color: rgba(255,100,80,1); }
+.settings-kbd-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.5);
+}
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.01em;
+}
+.settings-about {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 14px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  letter-spacing: 0.01em;
+  width: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .f-btn.spinning, .rail-btn.spinning { animation: none; }
   .topo-cup { animation: none; }
