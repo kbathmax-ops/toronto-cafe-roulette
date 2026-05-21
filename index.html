@@ -29,13 +29,13 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
         <span class="rail-label">Spin</span>
       </button>
-      <button class="rail-btn" id="rail-grid" title="All cafes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="rail-label">Browse</span>
-      </button>
       <button class="rail-btn" id="rail-map" title="Map">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
         <span class="rail-label">Map</span>
+      </button>
+      <button class="rail-btn" id="rail-grid" title="All cafes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="rail-label">Browse</span>
       </button>
       <button class="rail-btn" id="rail-add" title="Suggest a cafe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
@@ -57,15 +57,8 @@
     <main class="stage">
       <div class="bg-img"></div>
 
-      <!-- Floating brand mark — hovering over the 3D city -->
+      <!-- Floating brand mark — massive wordmark hovering over the 3D city -->
       <div id="map-brand" aria-hidden="true">
-        <div class="map-brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 9h12v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/>
-            <path d="M17 11h2a2 2 0 0 1 0 4h-2"/>
-            <path d="M7 5c0 1.5-1 1.5-1 3M11 5c0 1.5-1 1.5-1 3"/>
-          </svg>
-        </div>
         <span class="map-brand-name">caffein</span>
       </div>
 
