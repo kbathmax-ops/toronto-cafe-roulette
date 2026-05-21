@@ -178,8 +178,9 @@ body {
 }
 .hero-count {
   font-size: 72px;
-  font-weight: 300;
-  letter-spacing: -0.05em;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: -0.055em;
   color: #fff;
   line-height: 1;
 }
@@ -716,9 +717,10 @@ body {
 .auth-logo svg { width: 24px; height: 24px; }
 .auth-title {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
+  font-style: italic;
   color: #fff;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.045em;
   margin-bottom: 6px;
 }
 .auth-desc {
@@ -961,11 +963,12 @@ body {
   flex-shrink: 0;
 }
 .cgp-title {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
+  font-style: italic;
   color: #fff;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  text-transform: none;
 }
 .cgp-count {
   font-size: 12px;
@@ -1097,8 +1100,8 @@ body {
   font-weight: 800;
   letter-spacing: -0.055em;
   font-style: italic;
-  color: rgba(255,255,255,0.52);
-  text-shadow: 0 4px 40px rgba(0,0,0,0.55), 0 1px 6px rgba(0,0,0,0.85);
+  color: rgba(22, 21, 18, 0.78);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.18), 0 2px 12px rgba(255,255,255,0.08);
   line-height: 1;
   display: block;
 }
@@ -1187,11 +1190,12 @@ body {
 .mcd-title-block { flex: 1; min-width: 0; }
 .mcd-name-row { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; }
 .mcd-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
+  font-style: italic;
   color: #fff;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
   word-break: break-word;
 }
 .mcd-hood {
