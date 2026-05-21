@@ -712,35 +712,18 @@
 
     cafeinMap = new maplibregl.Map({
       container: "map-container",
-      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: [-79.385, 43.655],
       zoom: 12,
-      pitch: 50,
-      bearing: -10,
+      pitch: 0,
+      bearing: 0,
       antialias: true
     });
 
     cafeinMap.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
 
     cafeinMap.on("load", function () {
-      /* 3D building extrusions */
-      try {
-        var srcName = Object.keys(cafeinMap.getStyle().sources)[0];
-        cafeinMap.addLayer({
-          id: "caffein-3d-buildings",
-          source: srcName,
-          "source-layer": "building",
-          type: "fill-extrusion",
-          minzoom: 14,
-          paint: {
-            "fill-extrusion-color": "#e0dbd3",
-            "fill-extrusion-height": ["coalesce", ["get", "render_height"], ["get", "height"],
-              ["*", ["coalesce", ["get", "building:levels"], ["get", "levels"], 2], 3]],
-            "fill-extrusion-base": 0,
-            "fill-extrusion-opacity": 0.6
-          }
-        });
-      } catch (e) { /* style may not have building source-layer */ }
+      /* flat 2D map — no 3D building extrusions */
 
       /* Add named label markers */
       ALL.forEach(function (c) {
@@ -785,10 +768,10 @@
     if (!md || !cafeinMap) return;
     cafeinMap.flyTo({
       center: [md.lng, md.lat],
-      zoom: 15.5,
-      pitch: 55,
-      bearing: -10,
-      duration: 1600,
+      zoom: 15,
+      pitch: 0,
+      bearing: 0,
+      duration: 1400,
       essential: true
     });
     /* once the city fly lands, drop the spin animation and show idle controls */
