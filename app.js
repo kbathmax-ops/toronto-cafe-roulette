@@ -661,7 +661,7 @@
   function showCafeOnMap(c) {
     currentCafe = c;
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
-    showView("idle"); /* reset hero back to idle controls */
+    /* Keep whichever hero view is active (spinning stays spinning during fly) */
     populateMcd(c);
     if (mapReady) {
       openMap();
@@ -669,6 +669,8 @@
     } else {
       pendingFly = c;
       openMap();
+      /* map not ready yet — switch to idle after brief hold */
+      setTimeout(function () { showView("idle"); }, 900);
     }
   }
 
@@ -765,12 +767,13 @@
         el.appendChild(nameEl);
         el.appendChild(dotEl);
 
-        var popup = new maplibregl.Popup({ offset: [0, -36], closeButton: true, maxWidth: "280px" })
-          .setHTML(buildPopupHtml(c));
+        /* clicking a pin opens the full sidebar — no popup */
+        (function (cafe, pinEl) {
+          pinEl.addEventListener("click", function () { showCafeOnMap(cafe); });
+        }(c, el));
 
         var marker = new maplibregl.Marker({ element: el, anchor: "bottom" })
           .setLngLat([jLng, jLat])
-          .setPopup(popup)
           .addTo(cafeinMap);
 
         mapMarkers[key(c)] = { marker: marker, lat: jLat, lng: jLng };
@@ -796,9 +799,8 @@
       duration: 1600,
       essential: true
     });
-    cafeinMap.once("moveend", function () {
-      if (!md.marker.getPopup().isOpen()) md.marker.togglePopup();
-    });
+    /* once the city fly lands, drop the spin animation and show idle controls */
+    cafeinMap.once("moveend", function () { showView("idle"); });
   }
 
   function openMap() {
