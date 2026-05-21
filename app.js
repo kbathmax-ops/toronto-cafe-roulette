@@ -411,7 +411,11 @@
   function doSpin() { spin(spinBtns); }
   $("f-spin").addEventListener("click", doSpin);
   $("rail-spin").addEventListener("click", doSpin);
-  $("w-cta").addEventListener("click", doSpin);
+  $("w-cta").addEventListener("click", function () {
+    /* when spin limit reached the label switches to "Browse all" */
+    if ($("w-cta-label").textContent === "Browse all") { openGrid(); }
+    else { doSpin(); }
+  });
   $("hero-spin").addEventListener("click", doSpin);
   $("hero-browse").addEventListener("click", openGrid);
   $("dock").addEventListener("click", function () {
@@ -528,7 +532,15 @@
     else if (el.requestFullscreen) el.requestFullscreen();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.code === "Space") { e.preventDefault(); doSpin(); }
+    if (e.code === "Space" && e.target === document.body) { e.preventDefault(); doSpin(); }
+    if (e.code === "Escape") {
+      /* close any open modal or panel */
+      if (!$("settings-modal").hidden) { $("settings-modal").hidden = true; return; }
+      if (!$("auth-modal").hidden)     { $("auth-modal").hidden = true; return; }
+      if (!$("suggest-modal").hidden)  { $("suggest-modal").hidden = true; return; }
+      if (!$("cafe-grid-panel").hidden) { closeGrid(); return; }
+      if (document.querySelector(".map-sidebar.open")) { closeMap(); return; }
+    }
   });
 
   /* ===== Auth modal ===== */
@@ -537,6 +549,9 @@
   });
   $("auth-close").addEventListener("click", function () {
     $("auth-modal").hidden = true;
+  });
+  $("auth-modal").addEventListener("click", function (e) {
+    if (e.target === $("auth-modal")) $("auth-modal").hidden = true;
   });
   $("auth-submit").addEventListener("click", function () {
     var email = $("auth-email").value.trim();
@@ -853,6 +868,56 @@
         $("suggest-form").hidden = true;
         $("suggest-sent").hidden = false;
       }
+    });
+  }());
+
+  /* ===== Settings modal ===== */
+  (function () {
+    function openSettings() {
+      /* refresh live stats */
+      var used = spinsToday();
+      var left = spinsLeft();
+      $("settings-spins-sub").textContent = used + " of " + MAX_SPINS + " used today" + (left === 0 ? " — limit reached" : " · " + left + " left");
+      var favCount = currentUser ? dbFavs.length : guestFavs.length;
+      $("settings-favs-sub").textContent = favCount + " spot" + (favCount !== 1 ? "s" : "") + " saved" + (!currentUser ? " (local)" : "");
+      $("settings-cafe-count").textContent = ALL.length;
+      $("settings-modal").hidden = false;
+    }
+    function closeSettings() { $("settings-modal").hidden = true; }
+
+    $("rail-settings").addEventListener("click", openSettings);
+    $("settings-close").addEventListener("click", closeSettings);
+    $("settings-modal").addEventListener("click", function (e) {
+      if (e.target === $("settings-modal")) closeSettings();
+    });
+
+    $("settings-reset-spins").addEventListener("click", function () {
+      try { localStorage.removeItem("roast_spins"); } catch (e) {}
+      $("settings-spins-sub").textContent = "Reset — 5 spins available";
+      this.textContent = "Done ✓";
+      this.disabled = true;
+      setTimeout(function () {
+        $("settings-reset-spins").textContent = "Reset";
+        $("settings-reset-spins").disabled = false;
+      }, 2000);
+    });
+
+    $("settings-clear-favs").addEventListener("click", function () {
+      guestFavs = [];
+      try { localStorage.removeItem("caffein_favs"); } catch (e) {}
+      if (sb && currentUser) {
+        sb.from("caffein_favorites").delete().eq("user_id", currentUser.id);
+        dbFavs = [];
+      }
+      if (currentCafe) updateStarBtn(key(currentCafe));
+      $("settings-favs-sub").textContent = "Cleared";
+      this.textContent = "Done ✓";
+      this.disabled = true;
+      setTimeout(function () {
+        $("settings-clear-favs").textContent = "Clear";
+        $("settings-clear-favs").disabled = false;
+        $("settings-favs-sub").textContent = "0 spots saved";
+      }, 2000);
     });
   }());
 
