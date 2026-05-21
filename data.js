@@ -113,7 +113,17 @@ window.CAFES = [
   { name: "The Croissant Tree", neighborhood: "Church-Wellesley", address: "625 Church St", outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: true, noiseLevel: "unknown", vibe: "Church St bakery-cafe" },
   { name: "Crestfallen", neighborhood: "Koreatown", address: "663 Bloor St W", outlets: "many", wifi: "good", lighting: "moderate", seating: "limited", laptopFriendly: true, noiseLevel: "moderate", vibe: "Koreatown gem, ample power, good for long sessions" },
   { name: "Bloomers Bloor", neighborhood: "Bloor West Village", address: "873 Bloor St W", outlets: "unknown", wifi: "unknown", lighting: "unknown", seating: "unknown", laptopFriendly: true, noiseLevel: "unknown", vibe: "Bloor West neighbourhood cafe" },
-  { name: "Page One Coffee + Bar", neighborhood: "Downtown", address: "106 Mutual St", outlets: "some", wifi: "ok", lighting: "unknown", seating: "unknown", laptopFriendly: true, noiseLevel: "moderate", vibe: "downtown coffee-bar, good for longer stays" }
+  { name: "Page One Coffee + Bar", neighborhood: "Downtown", address: "106 Mutual St", outlets: "some", wifi: "ok", lighting: "unknown", seating: "unknown", laptopFriendly: true, noiseLevel: "moderate", vibe: "downtown coffee-bar, good for longer stays" },
+  { name: "Bready", neighborhood: "Financial District", address: "20 Adelaide St W", outlets: "some", wifi: "good", lighting: "bright/natural", seating: "limited", laptopFriendly: true, noiseLevel: "moderate", vibe: "corner bakery-cafe at Adelaide & York, great pastries" },
+  // ── Financial District ──────────────────────────────────────────────────────
+  { name: "Balzac's Coffee (Union Station)", neighborhood: "Financial District", address: "65 Front St W", outlets: "few", wifi: "good", lighting: "bright/natural", seating: "limited", laptopFriendly: "tolerated", noiseLevel: "lively", vibe: "grand beaux-arts hall — arrive before 9am for a seat" },
+  { name: "Fahrenheit Coffee", neighborhood: "Financial District", address: "King St W", outlets: "many", wifi: "good", lighting: "bright/natural", seating: "spacious", laptopFriendly: true, noiseLevel: "moderate", vibe: "sleek Bay St specialty cafe, solid for all-day sessions" },
+  { name: "Commoner Coffee", neighborhood: "Financial District", address: "100 Front St W", outlets: "some", wifi: "good", lighting: "moderate", seating: "limited", laptopFriendly: true, noiseLevel: "quiet", vibe: "tucked downtown espresso bar, calm between the towers" },
+  // ── Waterfront / Harbourfront ────────────────────────────────────────────────
+  { name: "Amsterdam BrewHouse", neighborhood: "Harbourfront", address: "245 Queens Quay W", outlets: "unknown", wifi: "unknown", lighting: "bright/natural", seating: "spacious", laptopFriendly: "tolerated", noiseLevel: "lively", vibe: "waterfront patio brewery-cafe, best lake views in the city" },
+  { name: "Steam Whistle Biergärten", neighborhood: "Harbourfront", address: "255 Bremner Blvd", outlets: "unknown", wifi: "unknown", lighting: "bright/natural", seating: "spacious", laptopFriendly: "tolerated", noiseLevel: "lively", vibe: "historic roundhouse at the lake — coffee by day, lagers by evening" },
+  { name: "The Rec Room", neighborhood: "Harbourfront", address: "255 Bremner Blvd", outlets: "some", wifi: "good", lighting: "moderate", seating: "spacious", laptopFriendly: "tolerated", noiseLevel: "lively", vibe: "massive lakefront entertainment lounge, good for group sessions" },
+  { name: "Meridian Arts Centre Cafe", neighborhood: "Harbourfront", address: "1 York St", outlets: "some", wifi: "good", lighting: "bright/natural", seating: "spacious", laptopFriendly: true, noiseLevel: "quiet", vibe: "arts complex cafe by the harbour, calm and underused" }
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,6 +131,22 @@ window.CAFES = [
 // key format matches key(c): "(name|neighborhood)".toLowerCase().trim()
 // ─────────────────────────────────────────────────────────────────────────────
 window.CAFE_META = {
+  "bready|financial district":
+    { hours: "7am–5pm Mon–Fri", website: "https://bready.ca", instagram: "bready.to", addedAt: "2026-05-20" },
+  "balzac's coffee (union station)|financial district":
+    { hours: "6am–8pm", website: "https://balzacs.com", instagram: "balzacsco", addedAt: "2026-05-20" },
+  "fahrenheit coffee|financial district":
+    { hours: "7am–6pm", instagram: "fahrenheitcoffee", addedAt: "2026-05-20" },
+  "commoner coffee|financial district":
+    { hours: "7am–5pm", addedAt: "2026-05-20" },
+  "amsterdam brewhouse|harbourfront":
+    { hours: "11am–12am", website: "https://amsterdambeer.com", instagram: "amsterdambrewhouse", addedAt: "2026-05-20" },
+  "steam whistle biergärten|harbourfront":
+    { hours: "12pm–9pm", website: "https://steamwhistle.ca", instagram: "steamwhistlebeer", addedAt: "2026-05-20" },
+  "the rec room|harbourfront":
+    { hours: "11am–2am", website: "https://the-rec-room.com", instagram: "therecroom", addedAt: "2026-05-20" },
+  "meridian arts centre cafe|harbourfront":
+    { hours: "9am–5pm", addedAt: "2026-05-20" },
   // ── Well-known cafes: hours + socials ────────────────────────────────────
   "dark horse espresso bar|kensington-chinatown":
     { hours: "7am–9pm", website: "https://darkhorseespresso.ca", instagram: "darkhorseespresso" },

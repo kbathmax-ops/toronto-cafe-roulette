@@ -52,6 +52,12 @@
   /* ===== Active filters ===== */
   var activeFilters = { openNow: false, nearMe: false, area: null };
 
+  /* ===== URL safety: only allow https:// and http:// schemes for external links ===== */
+  function safeUrl(url) {
+    if (!url) return null;
+    return /^https?:\/\//i.test(url) ? url : null;
+  }
+
   /* ===== System 7: pool with filters applied ===== */
   function pool() {
     var p = ALL.filter(function (c) { return c.laptopFriendly !== false; });
@@ -147,7 +153,7 @@
     if (hash && hash.startsWith("#cafe/")) {
       var slug = hash.slice(6);
       var cafe = ALL.find(function (c) { return cafeSlug(c) === slug; });
-      if (cafe) { showResult(cafe); return true; }
+      if (cafe) { showCafeOnMap(cafe); return true; }
     }
     return false;
   }
@@ -170,10 +176,17 @@
   }
   function updateStarBtn(cafeKey) {
     var btn = $("star-btn");
-    if (!btn || btn.hidden) return;
-    var faved = isFav(cafeKey);
-    btn.classList.toggle("starred", faved);
-    btn.title = faved ? "Saved ★" : "Save this cafe";
+    if (btn && !btn.hidden) {
+      var faved = isFav(cafeKey);
+      btn.classList.toggle("starred", faved);
+      btn.title = faved ? "Saved ★" : "Save this cafe";
+    }
+    var mstar = $("mcd-star");
+    if (mstar && !mstar.hidden) {
+      var faved2 = isFav(cafeKey);
+      mstar.classList.toggle("starred", faved2);
+      mstar.title = faved2 ? "Saved ★" : "Save this cafe";
+    }
   }
   function loadDbFavs() {
     if (!currentUser || !sb) return;
@@ -222,6 +235,22 @@
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
 
     showView("result");
+
+    /* cafe logo (Clearbit) */
+    (function () {
+      var logoEl = $("result-logo");
+      if (!logoEl) return;
+      var url = cafeLogoUrl(c);
+      if (url) {
+        logoEl.src = url;
+        logoEl.hidden = false;
+        logoEl.onerror = function () { this.hidden = true; };
+        logoEl.onload  = function () { this.hidden = false; };
+      } else {
+        logoEl.hidden = true;
+      }
+    }());
+
     $("w-grid").hidden = false;
     $("w-title").textContent = c.name;
     var loc = c.neighborhood + (c.address ? " · " + c.address : "");
@@ -250,9 +279,9 @@
     }
 
     /* website + instagram links */
-    var hasWeb = !!c.website, hasIg = !!c.instagram;
+    var hasWeb = !!safeUrl(c.website), hasIg = !!c.instagram;
     if (hasWeb) {
-      $("w-link-web").href = c.website;
+      $("w-link-web").href = safeUrl(c.website);
       $("w-link-web").hidden = false;
     } else {
       $("w-link-web").hidden = true;
@@ -307,8 +336,10 @@
       if (++i >= ticks) {
         spinning = false;
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
-        showResult(p[Math.floor(Math.random() * p.length)]);
+        var result = p[Math.floor(Math.random() * p.length)];
+        $("spin-name").textContent = result.name; /* land on the cafe name */
         bumpSpins();
+        setTimeout(function () { showCafeOnMap(result); }, 600);
         return;
       }
       spinTimer = setTimeout(tick, 40 + i * i * 1.2);
@@ -361,7 +392,7 @@
       if (!card) return;
       var k = card.dataset.key;
       var cafe = ALL.find(function (c) { return key(c) === k; });
-      if (cafe) { closeGrid(); showResult(cafe); }
+      if (cafe) { closeGrid(); showCafeOnMap(cafe); }
     });
   }
 
@@ -393,7 +424,8 @@
     $("fc-area-label").textContent = "By area";
     $("area-picker").hidden = true;
     closeGrid();
-    showIdle(); /* shows hero, hides widget */
+    closeMap();
+    showIdle();
   });
   $("rail-grid").addEventListener("click", openGrid);
   $("cgp-close").addEventListener("click", closeGrid);
@@ -403,7 +435,7 @@
     if (spinning) { clearTimeout(spinTimer); spinning = false;
       spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
     closeGrid();
-    if ($("map-panel")) { $("map-panel").hidden = true; $("rail-map").classList.remove("active"); }
+    closeMap();
     showIdle();
   }
   $("rail-logo").addEventListener("click", goHome);
@@ -543,59 +575,247 @@
     });
   }
 
-  /* ===== Star button ===== */
+  /* ===== Star buttons (hero card + map sidebar) ===== */
   $("star-btn").addEventListener("click", function () {
-    if (currentCafe) toggleFav(currentCafe);
+    if (currentCafe) { toggleFav(currentCafe); updateStarBtn(key(currentCafe)); }
   });
+  $("mcd-star").addEventListener("click", function () {
+    if (currentCafe) { toggleFav(currentCafe); updateStarBtn(key(currentCafe)); }
+  });
+  $("mcd-spin-btn").addEventListener("click", doSpin);
 
-  /* ===== Map ===== */
+  /* ===== Map sidebar: showCafeOnMap + populateMcd ===== */
+  var mcdTiles = null;
+
+  function populateMcd(c) {
+    if (!mcdTiles) mcdTiles = document.querySelectorAll("#mcd-grid .tile");
+    $("mcd-name").textContent = c.name;
+    $("mcd-hood").textContent = c.neighborhood;
+    $("mcd-new").hidden = !isNew(c);
+
+    /* logo */
+    var logoEl = $("mcd-logo");
+    var logoUrl = cafeLogoUrl(c);
+    if (logoUrl) {
+      logoEl.src = logoUrl; logoEl.hidden = false;
+      logoEl.onerror = function () { this.hidden = true; };
+      logoEl.onload  = function () { this.hidden = false; };
+    } else { logoEl.hidden = true; }
+
+    /* star */
+    $("mcd-star").hidden = false;
+    updateStarBtn(key(c));
+
+    /* address */
+    if (c.address) { $("mcd-addr-text").textContent = c.address; $("mcd-addr").hidden = false; }
+    else { $("mcd-addr").hidden = true; }
+
+    /* hours */
+    if (c.hours) { $("mcd-hours-text").textContent = c.hours; $("mcd-hours-wrap").hidden = false; }
+    else { $("mcd-hours-wrap").hidden = true; }
+
+    /* attribute tiles */
+    function setMcdTile(i, svg, lbl, val) {
+      var t = mcdTiles[i]; if (!t) return;
+      t.querySelector(".label").innerHTML = svg + '<span class="lbl"></span>';
+      t.querySelector(".lbl").textContent = lbl;
+      t.querySelector(".value").innerHTML = '<span class="val"></span>';
+      t.querySelector(".val").textContent = val;
+    }
+    setMcdTile(0, iconSvg("power"),  "Outlets",  cap(attrText(c.outlets)));
+    setMcdTile(1, iconSvg("wifi"),   "Wifi",     cap(attrText(c.wifi)));
+    setMcdTile(2, iconSvg("sun"),    "Lighting", cap(attrText(c.lighting)));
+    setMcdTile(3, iconSvg("volume"), "Noise",    cap(attrText(c.noiseLevel)));
+
+    /* vibe */
+    var note = c.laptopFriendly === false ? " · No laptops."
+             : c.laptopFriendly === "tolerated" ? " · Laptops limited at peak." : "";
+    $("mcd-vibe").textContent = (c.vibe ? c.vibe.charAt(0).toUpperCase() + c.vibe.slice(1) : "") + note;
+
+    /* links */
+    var hasWeb = !!safeUrl(c.website), hasIg = !!c.instagram;
+    if (hasWeb) { $("mcd-web").href = safeUrl(c.website); $("mcd-web").hidden = false; }
+    else { $("mcd-web").hidden = true; }
+    if (hasIg) { $("mcd-ig").href = "https://instagram.com/" + c.instagram.replace(/^@/, ""); $("mcd-ig").hidden = false; }
+    else { $("mcd-ig").hidden = true; }
+    $("mcd-links").hidden = !(hasWeb || hasIg);
+
+    $("mcd").hidden = false;
+  }
+
+  function showCafeOnMap(c) {
+    currentCafe = c;
+    try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
+    showView("idle"); /* reset hero back to idle controls */
+    populateMcd(c);
+    if (mapReady) {
+      openMap();
+      setTimeout(function () { doFlyTo(c); }, 150);
+    } else {
+      pendingFly = c;
+      openMap();
+    }
+  }
+
+  /* ===== Map (MapLibre GL JS — 3D) ===== */
   var cafeinMap = null;
+  var mapMarkers = {};
+  var mapReady = false;
+  var pendingFly = null;
+
+  function cafeLogoUrl(c) {
+    if (!c.website) return null;
+    var domain = c.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
+    return domain ? "https://logo.clearbit.com/" + domain : null;
+  }
+
+  function buildPopupHtml(c) {
+    var logo = cafeLogoUrl(c);
+    var attrs = [];
+    if (c.wifi && c.wifi !== "unknown")
+      attrs.push(c.wifi === "good" ? "wifi ✓" : c.wifi === "ok" ? "wifi ok" : "no wifi");
+    if (c.outlets && c.outlets !== "unknown") attrs.push("⚡ " + c.outlets);
+    if (c.noiseLevel && c.noiseLevel !== "unknown") attrs.push(c.noiseLevel);
+    if (c.lighting && c.lighting !== "unknown")
+      attrs.push("☀ " + (c.lighting === "bright/natural" ? "bright" : c.lighting));
+
+    return '<div class="map-popup">' +
+      '<div class="map-popup-header">' +
+        (logo ? '<img class="popup-logo" src="' + logo + '" alt="" onerror="this.style.display=\'none\'" loading="lazy">' : '') +
+        '<div><div class="popup-name">' + c.name + '</div>' +
+        '<div class="popup-hood">' + (c.neighborhood || "") + '</div></div>' +
+      '</div>' +
+      (c.hours ? '<div class="popup-hours">⏱ ' + c.hours + '</div>' : '') +
+      (attrs.length ? '<div class="popup-attrs">' +
+        attrs.map(function (a) { return '<span class="popup-attr">' + a + '</span>'; }).join("") +
+      '</div>' : '') +
+      (c.vibe ? '<div class="popup-vibe">' + c.vibe.charAt(0).toUpperCase() + c.vibe.slice(1) + '</div>' : '') +
+      ((c.website || c.instagram) ? '<div class="popup-links">' +
+        (safeUrl(c.website) ? '<a class="popup-link" href="' + safeUrl(c.website) + '" target="_blank" rel="noopener noreferrer">Website</a>' : '') +
+        (c.instagram ? '<a class="popup-link" href="https://instagram.com/' + c.instagram.replace(/^@/, "") + '" target="_blank" rel="noopener noreferrer">Instagram</a>' : '') +
+      '</div>' : '') +
+      '</div>';
+  }
+
   function initMap() {
-    if (cafeinMap || typeof L === "undefined") return;
+    if (cafeinMap || typeof maplibregl === "undefined") return;
     $("map-count").textContent = ALL.length + " spots";
-    cafeinMap = L.map("map-container", { center: [43.655, -79.385], zoom: 13, zoomControl: true });
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      attribution: '© <a href="https://openstreetmap.org">OSM</a> © <a href="https://carto.com">CARTO</a>',
-      maxZoom: 19
-    }).addTo(cafeinMap);
-    var icon = L.divIcon({ className: "map-pin", html: '<div class="map-pin-dot"></div>', iconSize: [12, 12], iconAnchor: [6, 6] });
-    ALL.forEach(function (c) {
-      var coord = HOOD_COORDS[c.neighborhood];
-      if (!coord) return;
-      var jLat = coord[0] + (Math.random() - 0.5) * 0.0025;
-      var jLng = coord[1] + (Math.random() - 0.5) * 0.0035;
-      var m = L.marker([jLat, jLng], { icon: icon });
-      m.bindPopup(
-        '<strong>' + c.name + '</strong>' +
-        (c.neighborhood ? '<br><span style="opacity:.6">' + c.neighborhood + '</span>' : '') +
-        (c.hours ? '<br><span style="opacity:.55">⏱ ' + c.hours + '</span>' : '')
-      );
-      m.on("click", function () {
-        $("map-panel").hidden = true;
-        $("rail-map").classList.remove("active");
-        showResult(c);
+
+    cafeinMap = new maplibregl.Map({
+      container: "map-container",
+      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+      center: [-79.385, 43.655],
+      zoom: 12,
+      pitch: 50,
+      bearing: -10,
+      antialias: true
+    });
+
+    cafeinMap.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+
+    cafeinMap.on("load", function () {
+      /* 3D building extrusions */
+      try {
+        var srcName = Object.keys(cafeinMap.getStyle().sources)[0];
+        cafeinMap.addLayer({
+          id: "caffein-3d-buildings",
+          source: srcName,
+          "source-layer": "building",
+          type: "fill-extrusion",
+          minzoom: 14,
+          paint: {
+            "fill-extrusion-color": "#e0dbd3",
+            "fill-extrusion-height": ["coalesce", ["get", "render_height"], ["get", "height"],
+              ["*", ["coalesce", ["get", "building:levels"], ["get", "levels"], 2], 3]],
+            "fill-extrusion-base": 0,
+            "fill-extrusion-opacity": 0.6
+          }
+        });
+      } catch (e) { /* style may not have building source-layer */ }
+
+      /* Add named label markers */
+      ALL.forEach(function (c) {
+        var coord = HOOD_COORDS[c.neighborhood];
+        if (!coord) return;
+        var jLat = coord[0] + (Math.random() - 0.5) * 0.0025;
+        var jLng = coord[1] + (Math.random() - 0.5) * 0.0035;
+
+        var el = document.createElement("div");
+        el.className = "map-pin-label";
+        var nameEl = document.createElement("span");
+        nameEl.className = "map-pin-name";
+        nameEl.textContent = c.name;
+        var dotEl = document.createElement("div");
+        dotEl.className = "map-pin-dot";
+        el.appendChild(nameEl);
+        el.appendChild(dotEl);
+
+        var popup = new maplibregl.Popup({ offset: [0, -36], closeButton: true, maxWidth: "280px" })
+          .setHTML(buildPopupHtml(c));
+
+        var marker = new maplibregl.Marker({ element: el, anchor: "bottom" })
+          .setLngLat([jLng, jLat])
+          .setPopup(popup)
+          .addTo(cafeinMap);
+
+        mapMarkers[key(c)] = { marker: marker, lat: jLat, lng: jLng };
       });
-      m.addTo(cafeinMap);
+
+      mapReady = true;
+      if (pendingFly) {
+        var toFly = pendingFly;
+        pendingFly = null;
+        setTimeout(function () { doFlyTo(toFly); }, 200);
+      }
     });
   }
-  function openMap() {
-    $("map-panel").hidden = false;
-    $("rail-map").classList.add("active");
-    setTimeout(function () { initMap(); if (cafeinMap) cafeinMap.invalidateSize(); }, 60);
-  }
-  function closeMap() {
-    $("map-panel").hidden = true;
-    $("rail-map").classList.remove("active");
-  }
-  $("rail-map").addEventListener("click", openMap);
-  $("map-close").addEventListener("click", closeMap);
 
-  /* add map-pin CSS dynamically */
-  (function () {
-    var s = document.createElement("style");
-    s.textContent = ".map-pin-dot{width:12px;height:12px;border-radius:50%;background:#1a1a17;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);}";
-    document.head.appendChild(s);
-  }());
+  function doFlyTo(c) {
+    var md = mapMarkers[key(c)];
+    if (!md || !cafeinMap) return;
+    cafeinMap.flyTo({
+      center: [md.lng, md.lat],
+      zoom: 15.5,
+      pitch: 55,
+      bearing: -10,
+      duration: 1600,
+      essential: true
+    });
+    cafeinMap.once("moveend", function () {
+      if (!md.marker.getPopup().isOpen()) md.marker.togglePopup();
+    });
+  }
+
+  function openMap() {
+    document.querySelector(".map-sidebar").classList.add("open");
+    $("rail-map").classList.add("active");
+    setTimeout(function () { if (cafeinMap) cafeinMap.resize(); }, 320);
+  }
+
+  function openMapAndFly(c) {
+    if (mapReady) {
+      openMap();
+      setTimeout(function () { doFlyTo(c); }, 200);
+    } else {
+      pendingFly = c;
+      openMap();
+    }
+  }
+
+  function closeMap() {
+    document.querySelector(".map-sidebar").classList.remove("open");
+    $("rail-map").classList.remove("active");
+    if ($("mcd")) $("mcd").hidden = true;
+  }
+
+  /* Rail map button: fly to Toronto overview (map is always visible) */
+  $("rail-map").addEventListener("click", function () {
+    closeMap(); /* close sidebar if open */
+    if (cafeinMap) {
+      cafeinMap.flyTo({ center: [-79.385, 43.655], zoom: 12, pitch: 50, bearing: -10, duration: 1200, essential: true });
+    }
+  });
+  $("map-close").addEventListener("click", closeMap);
 
   /* ===== Suggest a cafe ===== */
   (function () {
@@ -636,6 +856,7 @@
     });
   }());
 
-  /* ===== Init: restore from hash or show idle ===== */
+  /* ===== Init: start map immediately, then restore hash or show idle ===== */
+  initMap();
   if (!loadFromHash()) showIdle();
 })();
