@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  /* ===== Google Places Photos — add your key for real cafe photos =====
+     Get one at https://console.cloud.google.com — enable "Places API (New)"
+     ===================================================================== */
+  var GOOGLE_MAPS_KEY = "";
+
   /* ===== Supabase client ===== */
   var SB_URL = "https://admlkeibdjttgslmffmy.supabase.co";
   var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkbWxrZWliZGp0dGdzbG1mZm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDIzNjUsImV4cCI6MjA5MjYxODM2NX0.MEDiE6IrQRJZXwgK5S_xXU6h8hkhxrIlp847nrUrxMs";
@@ -591,6 +596,33 @@
   });
   $("mcd-spin-btn").addEventListener("click", doSpin);
 
+  /* ===== Google Places photo fetch (cached in localStorage) ===== */
+  function fetchCafePhoto(c, cb) {
+    if (!GOOGLE_MAPS_KEY) { cb(null); return; }
+    var cacheKey = "caffein_ph_" + key(c).slice(0, 44);
+    try {
+      var cached = localStorage.getItem(cacheKey);
+      if (cached !== null) { cb(cached || null); return; }
+    } catch (e) {}
+    fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_MAPS_KEY,
+        "X-Goog-FieldMask": "places.photos"
+      },
+      body: JSON.stringify({ textQuery: c.name + " " + (c.neighborhood || "") + " Toronto cafe", maxResultCount: 1 })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var pn = data.places && data.places[0] && data.places[0].photos && data.places[0].photos[0] && data.places[0].photos[0].name;
+      var url = pn ? "https://places.googleapis.com/v1/" + pn + "/media?maxHeightPx=350&maxWidthPx=600&key=" + GOOGLE_MAPS_KEY : "";
+      try { localStorage.setItem(cacheKey, url); } catch (e) {}
+      cb(url || null);
+    })
+    .catch(function () { cb(null); });
+  }
+
   /* ===== Map sidebar: showCafeOnMap + populateMcd ===== */
   var mcdTiles = null;
 
@@ -647,21 +679,33 @@
     else { $("mcd-ig").hidden = true; }
     $("mcd-links").hidden = !(hasWeb || hasIg);
 
+    /* photo */
+    var photoWrap = $("mcd-photo-wrap");
+    var photoImg  = $("mcd-photo-img");
+    photoWrap.hidden = true;
+    photoImg.className = "mcd-photo-img";
+    photoImg.src = "";
+    fetchCafePhoto(c, function (url) {
+      if (!url) return;
+      photoImg.onload  = function () { photoImg.classList.add("loaded"); photoWrap.hidden = false; };
+      photoImg.onerror = function () { photoWrap.hidden = true; };
+      photoImg.src = url;
+    });
+
     $("mcd").hidden = false;
   }
 
   function showCafeOnMap(c) {
     currentCafe = c;
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
-    var wasSpinning = !$("hero-spinning").hidden;
     populateMcd(c);
     if (mapReady) {
       openMap();
-      setTimeout(function () { doFlyTo(c, wasSpinning); }, 150);
+      setTimeout(function () { doFlyTo(c); }, 150);
     } else {
       pendingFly = c;
       openMap();
-      setTimeout(function () { wasSpinning ? showResult(c) : showView("idle"); }, 900);
+      setTimeout(function () { showView("idle"); }, 900);
     }
   }
 
@@ -756,19 +800,15 @@
       mapReady = true;
       if (pendingFly) {
         var toFly = pendingFly;
-        var pendingFromSpin = !$("hero-spinning").hidden;
         pendingFly = null;
-        setTimeout(function () { doFlyTo(toFly, pendingFromSpin); }, 200);
+        setTimeout(function () { doFlyTo(toFly); }, 200);
       }
     });
   }
 
-  function doFlyTo(c, fromSpin) {
+  function doFlyTo(c) {
     var md = mapMarkers[key(c)];
-    if (!md || !cafeinMap) {
-      fromSpin ? showResult(c) : showView("idle");
-      return;
-    }
+    if (!md || !cafeinMap) { showView("idle"); return; }
     cafeinMap.flyTo({
       center: [md.lng, md.lat],
       zoom: 15,
@@ -777,7 +817,7 @@
       duration: 1400,
       essential: true
     });
-    cafeinMap.once("moveend", function () { fromSpin ? showResult(c) : showView("idle"); });
+    cafeinMap.once("moveend", function () { showView("idle"); });
   }
 
   function openMap() {
