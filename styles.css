@@ -991,13 +991,15 @@ body {
 .cgp-close svg { width: 14px; height: 14px; }
 
 /* ── Browse grid — editorial light theme ── */
+/* NOTE: no `display` override here — the base .cafe-grid-panel sets display:flex
+   and .cafe-grid-panel[hidden] sets display:none. Adding display:flex on the ID
+   selector would win over [hidden] (specificity 1,0,0 > 0,2,0) and break hiding. */
 #cafe-grid-panel {
   background: #f0efe9;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 #cafe-grid-panel .cgp-header {
   padding: 20px 28px 16px;
