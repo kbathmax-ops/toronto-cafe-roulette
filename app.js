@@ -584,31 +584,13 @@
   });
   $("mcd-spin-btn").addEventListener("click", doSpin);
 
-  /* ===== Google Places photo fetch (cached in localStorage) ===== */
-  function fetchCafePhoto(c, cb) {
-    if (!GOOGLE_MAPS_KEY) { cb(null); return; }
-    var cacheKey = "caffein_ph_" + key(c).slice(0, 44);
-    try {
-      var cached = localStorage.getItem(cacheKey);
-      if (cached !== null) { cb(cached || null); return; }
-    } catch (e) {}
-    fetch("https://places.googleapis.com/v1/places:searchText", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": GOOGLE_MAPS_KEY,
-        "X-Goog-FieldMask": "places.photos"
-      },
-      body: JSON.stringify({ textQuery: c.name + " " + (c.neighborhood || "") + " Toronto cafe", maxResultCount: 1 })
-    })
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-      var pn = data.places && data.places[0] && data.places[0].photos && data.places[0].photos[0] && data.places[0].photos[0].name;
-      var url = pn ? "https://places.googleapis.com/v1/" + pn + "/media?maxHeightPx=350&maxWidthPx=600&key=" + GOOGLE_MAPS_KEY : "";
-      try { localStorage.setItem(cacheKey, url); } catch (e) {}
-      cb(url || null);
-    })
-    .catch(function () { cb(null); });
+  /* ===== Street View Static photo URL (synchronous — no fetch needed) ===== */
+  function cafeStreetViewUrl(c) {
+    if (!GOOGLE_MAPS_KEY) return null;
+    var loc = c.address ? c.address + ", Toronto, ON" : c.name + ", " + (c.neighborhood || "") + ", Toronto";
+    return "https://maps.googleapis.com/maps/api/streetview" +
+      "?size=600x350&location=" + encodeURIComponent(loc) +
+      "&fov=90&source=outdoor&return_error_code=true&key=" + GOOGLE_MAPS_KEY;
   }
 
   /* ===== Map sidebar: showCafeOnMap + populateMcd ===== */
@@ -667,18 +649,18 @@
     else { $("mcd-ig").hidden = true; }
     $("mcd-links").hidden = !(hasWeb || hasIg);
 
-    /* photo */
+    /* photo — Street View of the cafe's address */
     var photoWrap = $("mcd-photo-wrap");
     var photoImg  = $("mcd-photo-img");
     photoWrap.hidden = true;
     photoImg.className = "mcd-photo-img";
     photoImg.src = "";
-    fetchCafePhoto(c, function (url) {
-      if (!url) return;
+    var svUrl = cafeStreetViewUrl(c);
+    if (svUrl) {
       photoImg.onload  = function () { photoImg.classList.add("loaded"); photoWrap.hidden = false; };
       photoImg.onerror = function () { photoWrap.hidden = true; };
-      photoImg.src = url;
-    });
+      photoImg.src = svUrl;
+    }
 
     $("mcd").hidden = false;
   }
