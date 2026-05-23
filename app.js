@@ -415,19 +415,7 @@
   });
   $("hero-spin").addEventListener("click", doSpin);
   $("hero-browse").addEventListener("click", openGrid);
-  $("dock").addEventListener("click", function () {
-    if (spinning) { clearTimeout(spinTimer); spinning = false;
-      spinBtns.forEach(function (el) { el.classList.remove("spinning"); }); }
-    activeFilters.openNow = false; activeFilters.nearMe = false; activeFilters.area = null;
-    $("fc-open").classList.remove("active");
-    $("fc-near").classList.remove("active");
-    $("fc-area").classList.remove("active");
-    $("fc-area-label").textContent = "By area";
-    $("area-picker").hidden = true;
-    closeGrid();
-    closeMap();
-    showIdle();
-  });
+  /* dock removed — reset is handled by rail logo (goHome) */
   $("rail-grid").addEventListener("click", openGrid);
   $("cgp-close").addEventListener("click", closeGrid);
 
