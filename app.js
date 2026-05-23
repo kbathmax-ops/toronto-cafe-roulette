@@ -4,7 +4,7 @@
   /* ===== Google Places Photos — add your key for real cafe photos =====
      Get one at https://console.cloud.google.com — enable "Places API (New)"
      ===================================================================== */
-  var GOOGLE_MAPS_KEY = "";
+  var GOOGLE_MAPS_KEY = "AIzaSyBqOkqo9Ho0xbdtasfjvz6h7P3rhs27JBo";
 
   /* ===== Supabase client ===== */
   var SB_URL = "https://admlkeibdjttgslmffmy.supabase.co";
