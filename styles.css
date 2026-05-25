@@ -246,7 +246,7 @@ body {
 /* hero sub-views */
 #hero-idle {
   display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%;
-  background: rgba(10, 10, 9, 0.58);
+  background: rgba(10, 10, 9, 0.82);
   backdrop-filter: blur(28px) saturate(1.15);
   -webkit-backdrop-filter: blur(28px) saturate(1.15);
   border: 1px solid rgba(255,255,255,0.09);
