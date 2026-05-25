@@ -1468,25 +1468,94 @@ body {
    Mobile responsive
    ======================================== */
 @media (max-width: 640px) {
+  /* Grid: stage on top, rail as bottom tab bar */
   .app {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas: "stage" "rail";
   }
+  .stage { grid-area: stage; }
+
+  /* Rail → bottom tab bar */
   .rail {
-    display: none;
+    grid-area: rail;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    height: auto;
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    gap: 0;
+    background: rgba(10,10,10,0.97);
   }
+  .rail-brand, .rail-spacer, .rail-dot { display: none; }
+  .rail-btn {
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    min-width: 48px;
+  }
+  .rail-btn svg { width: 20px; height: 20px; }
+  .rail-label { display: block; font-size: 10px; letter-spacing: 0; }
+
+  /* Hero: lift above bottom nav */
+  .hero {
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 24px);
+  }
+
+  /* Modals: fluid width */
+  .suggest-card,
+  .auth-card,
+  .settings-card {
+    width: calc(100vw - 24px);
+    max-width: 420px;
+  }
+
+  /* Map sidebar: full width on mobile */
+  .map-sidebar {
+    width: 100%;
+    transform: translateX(-100%);
+  }
+
+  /* Hero card: tighten inner padding, stack action buttons */
+  #hero-idle {
+    padding: 14px 14px 12px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hero-spin-btn, .hero-browse-btn {
+    width: 100%;
+    flex: none;
+  }
+  .hero-browse-btn {
+    height: 44px;
+    justify-content: center;
+  }
+  .filter-chips {
+    padding: 2px 2px 4px;
+    gap: 6px;
+    justify-content: center;
+  }
+  .filter-chip {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+  .rail-label { display: none; }
+
+  /* Misc widget tweaks */
   .widget {
     width: min(460px, calc(100vw - 32px));
   }
-  .w-head .num {
-    font-size: 40px;
-  }
-  .w-head h1 {
-    font-size: 18px;
-    max-width: none;
-  }
-  .os-time {
-    font-size: 17px;
-  }
+  .w-head .num { font-size: 40px; }
+  .w-head h1 { font-size: 18px; max-width: none; }
+  .os-time { font-size: 17px; }
 }
 
 /* ========================================
