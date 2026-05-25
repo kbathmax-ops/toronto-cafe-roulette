@@ -4,7 +4,7 @@
   /* ===== Google Places Photos — add your key for real cafe photos =====
      Get one at https://console.cloud.google.com — enable "Places API (New)"
      ===================================================================== */
-  var GOOGLE_MAPS_KEY = "AIzaSyBqOkqo9Ho0xbdtasfjvz6h7P3rhs27JBo";
+  // Street View key is kept server-side — see api/streetview.js
 
   /* ===== Supabase client ===== */
   var SB_URL = "https://admlkeibdjttgslmffmy.supabase.co";
@@ -586,11 +586,8 @@
 
   /* ===== Street View Static photo URL (synchronous — no fetch needed) ===== */
   function cafeStreetViewUrl(c) {
-    if (!GOOGLE_MAPS_KEY) return null;
     var loc = c.address ? c.address + ", Toronto, ON" : c.name + ", " + (c.neighborhood || "") + ", Toronto";
-    return "https://maps.googleapis.com/maps/api/streetview" +
-      "?size=600x350&location=" + encodeURIComponent(loc) +
-      "&fov=90&source=outdoor&return_error_code=true&key=" + GOOGLE_MAPS_KEY;
+    return "/api/streetview?size=600x350&location=" + encodeURIComponent(loc);
   }
 
   /* ===== Map sidebar: showCafeOnMap + populateMcd ===== */
@@ -840,6 +837,12 @@
     $("suggest-modal").addEventListener("click", function (e) { if (e.target === $("suggest-modal")) closeSuggest(); });
 
     $("sug-submit").addEventListener("click", function () {
+      var lastSubmit = parseInt(localStorage.getItem("caffein_last_submit") || "0", 10);
+      if (Date.now() - lastSubmit < 3600000) {
+        $("sug-name").placeholder = "Please wait 1 hour between suggestions";
+        $("sug-name").focus();
+        return;
+      }
       var name = $("sug-name").value.trim();
       if (!name) { $("sug-name").focus(); return; }
       var payload = {
@@ -849,14 +852,17 @@
         instagram: $("sug-ig").value.trim().replace(/^@/, "") || null,
         notes: $("sug-notes").value.trim() || null
       };
-      if (sb) {
-        sb.from("caffein_submissions").insert(payload).then(function (res) {
-          if (!res.error) { $("suggest-form").hidden = true; $("suggest-sent").hidden = false; }
-        });
-      } else {
-        $("suggest-form").hidden = true;
-        $("suggest-sent").hidden = false;
-      }
+      fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function (r) {
+        if (r.ok) {
+          localStorage.setItem("caffein_last_submit", Date.now().toString());
+          $("suggest-form").hidden = true;
+          $("suggest-sent").hidden = false;
+        }
+      });
     });
   }());
 
