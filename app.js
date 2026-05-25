@@ -128,26 +128,6 @@
     if ($("hero-num")) $("hero-num").textContent = n;
   }
 
-  /* ===== System 6: spins-today counter + 5/day limit ===== */
-  var MAX_SPINS = 5;
-  function today() { return new Date().toISOString().slice(0, 10); }
-  function bumpSpins() {
-    var d = today(), n = 1;
-    try {
-      var s = JSON.parse(localStorage.getItem("roast_spins") || "{}");
-      n = (s.date === d ? s.n : 0) + 1;
-      localStorage.setItem("roast_spins", JSON.stringify({ date: d, n: n }));
-    } catch (e) {}
-    return n;
-  }
-  function spinsToday() {
-    try {
-      var s = JSON.parse(localStorage.getItem("roast_spins") || "{}");
-      return s.date === today() ? s.n : 0;
-    } catch (e) { return 0; }
-  }
-  function spinsLeft() { return Math.max(0, MAX_SPINS - spinsToday()); }
-
   /* ===== Hash routing ===== */
   function cafeSlug(c) {
     return (c.name + "-" + (c.neighborhood || ""))
@@ -315,11 +295,6 @@
   /* ===== System 3: roulette spin (quadratic deceleration) ===== */
   function spin(triggers) {
     if (spinning) return;
-    if (spinsLeft() === 0) {
-      $("spin-name").textContent = "5 coffees today — come back tomorrow";
-      showView("spinning");
-      return;
-    }
     var p = pool();
     if (!p.length) { showEmpty(); return; }
     spinning = true;
@@ -335,7 +310,6 @@
         triggers.forEach(function (el) { if (el) el.classList.remove("spinning"); });
         var result = p[Math.floor(Math.random() * p.length)];
         $("spin-name").textContent = result.name; /* land on the cafe name */
-        bumpSpins();
         setTimeout(function () { showCafeOnMap(result); }, 600);
         return;
       }
@@ -870,9 +844,6 @@
   (function () {
     function openSettings() {
       /* refresh live stats */
-      var used = spinsToday();
-      var left = spinsLeft();
-      $("settings-spins-sub").textContent = used + " of " + MAX_SPINS + " used today" + (left === 0 ? " — limit reached" : " · " + left + " left");
       var favCount = currentUser ? dbFavs.length : guestFavs.length;
       $("settings-favs-sub").textContent = favCount + " spot" + (favCount !== 1 ? "s" : "") + " saved" + (!currentUser ? " (local)" : "");
       $("settings-cafe-count").textContent = ALL.length;
@@ -886,16 +857,6 @@
       if (e.target === $("settings-modal")) closeSettings();
     });
 
-    $("settings-reset-spins").addEventListener("click", function () {
-      try { localStorage.removeItem("roast_spins"); } catch (e) {}
-      $("settings-spins-sub").textContent = "Reset — 5 spins available";
-      this.textContent = "Done ✓";
-      this.disabled = true;
-      setTimeout(function () {
-        $("settings-reset-spins").textContent = "Reset";
-        $("settings-reset-spins").disabled = false;
-      }, 2000);
-    });
 
     $("settings-clear-favs").addEventListener("click", function () {
       guestFavs = [];
