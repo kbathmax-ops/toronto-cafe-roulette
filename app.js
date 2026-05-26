@@ -623,7 +623,10 @@
     else { $("mcd-web").hidden = true; }
     if (hasIg) { $("mcd-ig").href = "https://instagram.com/" + c.instagram.replace(/^@/, ""); $("mcd-ig").hidden = false; }
     else { $("mcd-ig").hidden = true; }
-    $("mcd-links").hidden = !(hasWeb || hasIg);
+    var mapsQ = encodeURIComponent((c.name || "") + " Toronto");
+    $("mcd-gmaps").href = "https://www.google.com/maps/search/?api=1&query=" + mapsQ;
+    $("mcd-amaps").href = "https://maps.apple.com/?q=" + mapsQ;
+    $("mcd-links").hidden = false;
 
     /* photo — Street View of the cafe's address */
     var photoWrap = $("mcd-photo-wrap");
