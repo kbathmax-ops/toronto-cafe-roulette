@@ -277,7 +277,12 @@
     } else {
       $("w-link-ig").hidden = true;
     }
-    $("w-links").hidden = !(hasWeb || hasIg);
+    var mapsQuery = encodeURIComponent((c.name || "") + " Toronto");
+    $("w-link-gmaps").href = "https://www.google.com/maps/search/?api=1&query=" + mapsQuery;
+    $("w-link-gmaps").hidden = false;
+    $("w-link-amaps").href = "https://maps.apple.com/?q=" + mapsQuery;
+    $("w-link-amaps").hidden = false;
+    $("w-links").hidden = false;
 
     var note = "";
     if (c.laptopFriendly === false) note = " · No laptops here.";
