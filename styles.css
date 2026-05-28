@@ -1655,46 +1655,36 @@ kbd {
 }
 
 /* ========================================
-   Hero collapsed toggle — 3 dots pill
+   Hero inline handle — 3 dots at top of idle card
    ======================================== */
-.hero-toggle {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12;
+.hero-handle {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 5px;
-  padding: 11px 20px;
-  border-radius: 999px;
-  background: rgba(20,18,16,0.70);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.40);
+  padding: 2px 0 4px;
+  width: 100%;
   cursor: pointer;
-  transition: background 150ms var(--ease-out), transform 150ms var(--ease-out);
 }
-.hero-toggle:hover { background: rgba(36,34,30,0.88); transform: translateX(-50%) translateY(-2px); }
-.hero-toggle:active { transform: translateX(-50%) scale(0.96); }
-.hero-toggle span {
+.hero-handle span {
   width: 5px; height: 5px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.35);
   display: block;
   transition: background 150ms;
 }
-.hero-toggle:hover span { background: rgba(255,255,255,1); }
-.hero-toggle[hidden] { display: none; }
+.hero-handle:hover span { background: rgba(255,255,255,0.75); }
 
-/* Hero hidden state — when map sidebar is open */
-.hero.hero-hidden { display: none !important; }
-
-@media (max-width: 640px) {
-  .hero-toggle {
-    bottom: calc(68px + 12px + env(safe-area-inset-bottom, 0px));
-  }
+/* Collapsed state — only the handle row is visible */
+#hero-idle.collapsed {
+  padding: 10px 20px;
+  gap: 0;
+}
+#hero-idle.collapsed .hero-top,
+#hero-idle.collapsed .filter-chips,
+#hero-idle.collapsed .hero-actions,
+#hero-idle.collapsed .suggest-link {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
