@@ -1654,6 +1654,49 @@ kbd {
   width: 100%;
 }
 
+/* ========================================
+   Hero collapsed toggle — 3 dots pill
+   ======================================== */
+.hero-toggle {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: rgba(20,18,16,0.70);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.40);
+  cursor: pointer;
+  transition: background 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+.hero-toggle:hover { background: rgba(36,34,30,0.88); transform: translateX(-50%) translateY(-2px); }
+.hero-toggle:active { transform: translateX(-50%) scale(0.96); }
+.hero-toggle span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+  display: block;
+  transition: background 150ms;
+}
+.hero-toggle:hover span { background: rgba(255,255,255,1); }
+.hero-toggle[hidden] { display: none; }
+
+/* Hero hidden state — when map sidebar is open */
+.hero.hero-hidden { display: none !important; }
+
+@media (max-width: 640px) {
+  .hero-toggle {
+    bottom: calc(68px + 12px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .f-btn.spinning, .rail-btn.spinning { animation: none; }
   .topo-cup { animation: none; }
