@@ -772,6 +772,8 @@
   function openMap() {
     document.querySelector(".map-sidebar").classList.add("open");
     $("rail-map").classList.add("active");
+    document.querySelector(".hero").classList.add("hero-hidden");
+    $("hero-toggle").hidden = false;
     setTimeout(function () { if (cafeinMap) cafeinMap.resize(); }, 320);
   }
 
@@ -789,6 +791,8 @@
     document.querySelector(".map-sidebar").classList.remove("open");
     $("rail-map").classList.remove("active");
     if ($("mcd")) $("mcd").hidden = true;
+    document.querySelector(".hero").classList.remove("hero-hidden");
+    $("hero-toggle").hidden = true;
   }
 
   /* Rail map button: fly to Toronto overview (map is always visible) */
@@ -799,6 +803,9 @@
     }
   });
   $("map-close").addEventListener("click", closeMap);
+  $("hero-toggle").addEventListener("click", function () {
+    document.querySelector(".hero").classList.toggle("hero-hidden");
+  });
 
   /* ===== Suggest a cafe ===== */
   (function () {
