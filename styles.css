@@ -1502,10 +1502,13 @@ body {
   .rail-btn svg { width: 20px; height: 20px; }
   .rail-label { display: block; font-size: 10px; letter-spacing: 0; }
 
-  /* Hero: lift above bottom nav */
+  /* Hero: lift above bottom nav, cap height so map stays visible */
   .hero {
     bottom: calc(68px + env(safe-area-inset-bottom, 0px));
     width: calc(100vw - 24px);
+    max-height: 62vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Modals: fluid width */
