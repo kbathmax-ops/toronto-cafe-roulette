@@ -300,6 +300,8 @@
   /* ===== System 3: roulette spin (quadratic deceleration) ===== */
   function spin(triggers) {
     if (spinning) return;
+    /* close sidebar so the spinning animation is visible */
+    if (document.querySelector(".map-sidebar.open")) closeMap();
     var p = pool();
     if (!p.length) { showEmpty(); return; }
     spinning = true;
@@ -772,8 +774,7 @@
   function openMap() {
     document.querySelector(".map-sidebar").classList.add("open");
     $("rail-map").classList.add("active");
-    document.querySelector(".hero").classList.add("hero-hidden");
-    $("hero-toggle").hidden = false;
+    $("hero-idle").classList.add("collapsed");
     setTimeout(function () { if (cafeinMap) cafeinMap.resize(); }, 320);
   }
 
@@ -791,8 +792,7 @@
     document.querySelector(".map-sidebar").classList.remove("open");
     $("rail-map").classList.remove("active");
     if ($("mcd")) $("mcd").hidden = true;
-    document.querySelector(".hero").classList.remove("hero-hidden");
-    $("hero-toggle").hidden = true;
+    $("hero-idle").classList.remove("collapsed");
   }
 
   /* Rail map button: fly to Toronto overview (map is always visible) */
@@ -803,8 +803,8 @@
     }
   });
   $("map-close").addEventListener("click", closeMap);
-  $("hero-toggle").addEventListener("click", function () {
-    document.querySelector(".hero").classList.toggle("hero-hidden");
+  $("hero-handle").addEventListener("click", function () {
+    $("hero-idle").classList.toggle("collapsed");
   });
 
   /* ===== Suggest a cafe ===== */
