@@ -52,7 +52,23 @@
     "Little Italy": [43.657, -79.411], "Garden District": [43.656, -79.375],
     "Moss Park": [43.654, -79.370], "Dovercourt": [43.666, -79.434],
     "Scarborough (Birch Cliff)": [43.691, -79.268], "Canary District": [43.649, -79.355],
+    "The Annex": [43.669, -79.404], "Kensington-Chinatown": [43.654, -79.400],
+    "Brockton Village": [43.650, -79.437], "Dundas West": [43.654, -79.443],
+    "East Danforth": [43.684, -79.321], "Little India": [43.676, -79.326],
+    "Pape Village": [43.689, -79.345], "Regent Park": [43.660, -79.362],
+    "Riverside": [43.658, -79.348], "Upper Beaches": [43.682, -79.305],
+    "The Beaches": [43.671, -79.296], "Yonge & Dundas": [43.656, -79.381],
+    "Downtown Yonge": [43.657, -79.382], "Bay Street": [43.650, -79.383],
+    "Entertainment District": [43.645, -79.390], "Fashion District": [43.647, -79.396],
+    "Yonge & Davenport": [43.676, -79.393], "Lawrence Park": [43.728, -79.401],
+    "Forest Hill": [43.696, -79.414], "Chaplin Estates": [43.701, -79.405],
+    "Leaside": [43.708, -79.366],
+    "Etobicoke (Long Branch)": [43.593, -79.539], "Etobicoke (Mimico)": [43.617, -79.497],
   };
+
+  /* Fallback so a cafe in an unmapped neighbourhood still gets a pin + a fly-to */
+  var TORONTO_CENTER = [43.652, -79.382];
+  function hoodCoord(c) { return HOOD_COORDS[c.neighborhood] || TORONTO_CENTER; }
 
   /* ===== Active filters ===== */
   var activeFilters = { openNow: false, nearMe: false, area: null };
@@ -721,8 +737,7 @@
 
       /* Add named label markers */
       ALL.forEach(function (c) {
-        var coord = HOOD_COORDS[c.neighborhood];
-        if (!coord) return;
+        var coord = hoodCoord(c);
         var jLat = coord[0] + (Math.random() - 0.5) * 0.0025;
         var jLng = coord[1] + (Math.random() - 0.5) * 0.0035;
 
@@ -757,18 +772,45 @@
     });
   }
 
+  var flyIdleTimer = null;
+
   function doFlyTo(c) {
+    if (!cafeinMap) { showView("idle"); return; }
+
+    /* fall back to the neighbourhood coord if this cafe never got a marker */
     var md = mapMarkers[key(c)];
-    if (!md || !cafeinMap) { showView("idle"); return; }
-    cafeinMap.flyTo({
-      center: [md.lng, md.lat],
+    var target = md ? [md.lng, md.lat] : [hoodCoord(c)[1], hoodCoord(c)[0]];
+
+    /* zoom out first so consecutive spins always read as a fresh zoom-in */
+    var cur = cafeinMap.getCenter();
+    var moved = Math.abs(cur.lng - target[0]) > 1e-6 || Math.abs(cur.lat - target[1]) > 1e-6;
+
+    var opts = {
+      center: target,
       zoom: 15,
       pitch: 0,
       bearing: 0,
       duration: 1400,
       essential: true
-    });
-    cafeinMap.once("moveend", function () { showView("idle"); });
+    };
+    /* dip out then back in when hopping between two cafes */
+    if (moved) opts.minZoom = 12.4;
+
+    cafeinMap.stop(); /* cancel any in-flight animation from a previous spin */
+    cafeinMap.flyTo(opts);
+
+    /* moveend can be swallowed if the fly is interrupted — always release the view */
+    clearTimeout(flyIdleTimer);
+    var done = false;
+    function release() {
+      if (done) return;
+      done = true;
+      clearTimeout(flyIdleTimer);
+      cafeinMap.off("moveend", release);
+      showView("idle");
+    }
+    cafeinMap.on("moveend", release);
+    flyIdleTimer = setTimeout(release, 1800);
   }
 
   function openMap() {
