@@ -116,6 +116,8 @@ body {
   line-height: 1;
 }
 .rail-spacer { flex: 1; }
+.rail-support { text-decoration: none; }
+.rail-support:hover { color: #ffdd55; background: rgba(255,221,85,0.08); }
 .rail-dot {
   width: 6px; height: 6px; border-radius: 50%;
   background: #34c759;
@@ -1618,6 +1620,11 @@ body {
 }
 .settings-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
 .settings-btn:active { transform: scale(0.96); }
+.settings-btn-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
 .settings-btn-danger { color: rgba(255,100,80,0.8); border-color: rgba(255,100,80,0.18); }
 .settings-btn-danger:hover { background: rgba(255,100,80,0.12); color: rgba(255,100,80,1); }
 .settings-kbd-row {
