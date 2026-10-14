@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Paris Baguette (Yonge & Sheppard)",
+    "city": "Toronto",
+    "neighborhood": "North York",
+    "address": "4841 Yonge Street, North York, ON",
+    "coordinates": [
+      43.76243968,
+      -79.41039478
+    ],
+    "website": "https://parisbaguette.ca/locations/on/north-york/4841-yonge-street/",
+    "sources": [
+      "https://parisbaguette.ca/locations/on/north-york/4841-yonge-street/"
+    ],
+    "vibe": "Bakery café with pastries, cakes and Lavazza coffee near Yonge and Sheppard.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Daily 7am–9pm",
+    "weeklyHours": [
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ],
+      [
+        420,
+        1260
+      ]
+    ]
+  },
+  {
+    "name": "ICHA TEA (North York)",
+    "city": "Toronto",
+    "neighborhood": "North York",
+    "address": "2 Sheppard Avenue East, North York, ON",
+    "coordinates": [
+      43.7651,
+      -79.4109
+    ],
+    "website": "https://ichateashop.com/",
+    "sources": [
+      "https://ichateashop.com/pages/about-us",
+      "https://www.verytoronto.com/places/icha-tea"
+    ],
+    "vibe": "Tea and matcha at Yonge Sheppard Centre.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "coordinateAccuracy": "approximate; published directory map"
+  },
+  {
+    "name": "Starbucks (Mel Lastman Square)",
+    "city": "Toronto",
+    "neighborhood": "North York",
+    "address": "5140 Yonge Street, North York, ON",
+    "coordinates": [
+      43.768431,
+      -79.413129
+    ],
+    "website": "https://www.starbucks.ca/",
+    "sources": [
+      "https://yongenorthyork.com/listing/starbucks-mel-lastman-square/"
+    ],
+    "vibe": "Coffee beside Mel Lastman Square and North York Centre.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown"
+  }
+]

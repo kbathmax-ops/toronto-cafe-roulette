@@ -98,7 +98,7 @@
           var hours = c.weeklyHours[day];
           return !!hours && minutes >= hours[0] && minutes < hours[1];
         }
-        if (c.city === "Waterloo") return false; // No verified opening hours.
+        if (c.verifiedAt) return false; // Verified listing, but no confirmed opening hours.
         return (minutes >= 420 && minutes < 1320) || (c.vibe && (c.vibe.indexOf("24") >= 0 || c.vibe.indexOf("11pm") >= 0));
       });
     }
