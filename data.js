@@ -251,3 +251,345 @@ window.MY_MAPS_PICKS = [
   { name: "Forno Cultura", neighborhood: "King West", address: null, outlets: "few", wifi: "ok", lighting: "moderate", seating: "limited", laptopFriendly: "tolerated", noiseLevel: "moderate", vibe: "your Maps pick · 4.5★ artisan Italian bakery" },
   { name: "Humble Donkey", neighborhood: "Toronto", address: null, outlets: "some", wifi: "good", lighting: "moderate", seating: "limited", laptopFriendly: true, noiseLevel: "moderate", vibe: "your Maps pick · 4.1★ cafe" }
 ];
+
+// Waterloo listings verified against official sites and the Uptown Waterloo BIA, 2026-10-14.
+// Coordinates come from source map embeds; unverified amenities remain unknown.
+window.CAFES.push(...[
+  {
+    "name": "Pink Crow Café",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "30 William Street West, Waterloo, ON",
+    "coordinates": [
+      43.460857,
+      -80.522725
+    ],
+    "website": "https://www.pinkcrowcafe.com/visit-us",
+    "vibe": "Coffee, baked goods and a patio in Uptown Waterloo.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://www.pinkcrowcafe.com/visit-us",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Mon–Thu 7:30am–4pm · Fri–Sun 7:30am–6pm",
+    "weeklyHours": [
+      [
+        450,
+        1080
+      ],
+      [
+        450,
+        960
+      ],
+      [
+        450,
+        960
+      ],
+      [
+        450,
+        960
+      ],
+      [
+        450,
+        960
+      ],
+      [
+        450,
+        1080
+      ],
+      [
+        450,
+        1080
+      ]
+    ]
+  },
+  {
+    "name": "Seven Shores",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "10 Regina Street North, Unit 4, Waterloo, ON",
+    "coordinates": [
+      43.466017,
+      -80.521122
+    ],
+    "website": "https://www.sevenshores.ca/",
+    "vibe": "Community-owned café with house-baked treats and a community room.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://www.sevenshores.ca/",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Mon–Fri 7am–5pm · Sat–Sun 8am–4pm",
+    "weeklyHours": [
+      [
+        480,
+        960
+      ],
+      [
+        420,
+        1020
+      ],
+      [
+        420,
+        1020
+      ],
+      [
+        420,
+        1020
+      ],
+      [
+        420,
+        1020
+      ],
+      [
+        420,
+        1020
+      ],
+      [
+        480,
+        960
+      ]
+    ]
+  },
+  {
+    "name": "Café 22",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "22 King Street South, Waterloo, ON",
+    "coordinates": [
+      43.464684,
+      -80.521908
+    ],
+    "website": "https://cafe22-waterloo.com/contact-us",
+    "vibe": "An Uptown stop for coffee.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://cafe22-waterloo.com/contact-us",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Mon–Fri 9am–6pm · Sat 9am–5pm · Sun closed",
+    "weeklyHours": [
+      null,
+      [
+        540,
+        1080
+      ],
+      [
+        540,
+        1080
+      ],
+      [
+        540,
+        1080
+      ],
+      [
+        540,
+        1080
+      ],
+      [
+        540,
+        1080
+      ],
+      [
+        540,
+        1020
+      ]
+    ]
+  },
+  {
+    "name": "Café 1842",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "59 King Street North, Waterloo, ON",
+    "coordinates": [
+      43.466999,
+      -80.523219
+    ],
+    "website": "http://www.huetherhotel.com",
+    "vibe": "Café at the Huether Hotel.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "http://www.huetherhotel.com",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown"
+  },
+  {
+    "name": "Pilot Coffee Roasters (Uptown Waterloo)",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "114 King Street South, Waterloo, ON",
+    "coordinates": [
+      43.462613,
+      -80.52143
+    ],
+    "website": "https://pilotcoffeeroasters.com/pages/uptown-waterloo-cafe",
+    "vibe": "Pilot’s Uptown Waterloo coffee shop.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://pilotcoffeeroasters.com/pages/uptown-waterloo-cafe",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Daily 7am–6pm",
+    "weeklyHours": [
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ],
+      [
+        420,
+        1080
+      ]
+    ]
+  },
+  {
+    "name": "Princess Café",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "46 King Street North, Waterloo, ON",
+    "coordinates": [
+      43.466516,
+      -80.522299
+    ],
+    "website": "https://www.princesscafe.ca/",
+    "vibe": "Family-run café serving coffee and paninis.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://www.princesscafe.ca/",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown"
+  },
+  {
+    "name": "Midnight Run Café",
+    "city": "Waterloo",
+    "neighborhood": "Uptown Waterloo",
+    "address": "84 King Street North, Waterloo, ON",
+    "coordinates": [
+      43.468042,
+      -80.522939
+    ],
+    "website": "https://midnightruncafe.ca",
+    "vibe": "Independent café on King Street North.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://midnightruncafe.ca",
+      "https://uptownwaterloobia.com/business-directory-search-results/"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown"
+  },
+  {
+    "name": "Camellia Bake Shop",
+    "city": "Waterloo",
+    "neighborhood": "Northfield, Waterloo",
+    "address": "305 Northfield Drive East, Waterloo, ON",
+    "coordinates": [
+      43.5144417,
+      -80.5183157
+    ],
+    "website": "https://www.camelliabakeshop.ca/contact",
+    "vibe": "Coffee and baked goods on Northfield Drive.",
+    "addedAt": "2026-10-14",
+    "verifiedAt": "2026-10-14",
+    "sources": [
+      "https://www.camelliabakeshop.ca/contact"
+    ],
+    "outlets": "unknown",
+    "wifi": "unknown",
+    "lighting": "unknown",
+    "seating": "unknown",
+    "laptopFriendly": "unknown",
+    "noiseLevel": "unknown",
+    "hours": "Wed–Sun 8am–4pm · Mon–Tue closed",
+    "weeklyHours": [
+      [
+        480,
+        960
+      ],
+      null,
+      null,
+      [
+        480,
+        960
+      ],
+      [
+        480,
+        960
+      ],
+      [
+        480,
+        960
+      ],
+      [
+        480,
+        960
+      ]
+    ]
+  }
+]);

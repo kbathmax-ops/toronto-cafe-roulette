@@ -68,10 +68,15 @@
 
   /* Fallback so a cafe in an unmapped neighbourhood still gets a pin + a fly-to */
   var TORONTO_CENTER = [43.652, -79.382];
-  function hoodCoord(c) { return HOOD_COORDS[c.neighborhood] || TORONTO_CENTER; }
+  function cafeCity(c) { return c.city || "Toronto"; }
+  function cafeLocation(c) { return c.address ? c.address + (c.city ? "" : ", Toronto, ON") : c.name + ", " + cafeCity(c) + ", ON"; }
+  function hoodCoord(c) { return c.coordinates || HOOD_COORDS[c.neighborhood] || CITY_CENTERS[cafeCity(c)]; }
+  var CITY_CENTERS = { Toronto: TORONTO_CENTER, Waterloo: [43.466, -80.523] };
+  HOOD_COORDS["Uptown Waterloo"] = [43.466, -80.523];
+  HOOD_COORDS["Northfield, Waterloo"] = [43.5144417, -80.5183157];
 
   /* ===== Active filters ===== */
-  var activeFilters = { openNow: false, nearMe: false, area: null };
+  var activeFilters = { openNow: false, nearMe: false, area: null, city: "Toronto" };
 
   /* ===== URL safety: only allow https:// and http:// schemes for external links ===== */
   function safeUrl(url) {
@@ -81,16 +86,23 @@
 
   /* ===== System 7: pool with filters applied ===== */
   function pool() {
-    var p = ALL.filter(function (c) { return c.laptopFriendly !== false; });
+    var p = ALL.filter(function (c) { return cafeCity(c) === activeFilters.city && c.laptopFriendly !== false; });
     if (activeFilters.openNow) {
-      var h = new Date().getHours();
-      var lateNight = h >= 22 || h < 7;
-      if (lateNight) {
-        p = p.filter(function (c) {
-          return c.vibe && (c.vibe.indexOf("24") >= 0 || c.vibe.indexOf("11pm") >= 0);
-        });
-      }
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Toronto", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+      var time = {};
+      parts.forEach(function (p) { time[p.type] = p.value; });
+      var day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(time.weekday);
+      var minutes = Number(time.hour) * 60 + Number(time.minute);
+      p = p.filter(function (c) {
+        if (c.weeklyHours) {
+          var hours = c.weeklyHours[day];
+          return !!hours && minutes >= hours[0] && minutes < hours[1];
+        }
+        if (c.city === "Waterloo") return false; // No verified opening hours.
+        return (minutes >= 420 && minutes < 1320) || (c.vibe && (c.vibe.indexOf("24") >= 0 || c.vibe.indexOf("11pm") >= 0));
+      });
     }
+
     if (activeFilters.area) {
       p = p.filter(function (c) { return c.neighborhood === activeFilters.area; });
     }
@@ -115,7 +127,7 @@
 
   /* designed idle content — restored on reset */
   var IDLE = {
-    title: "Let's get you connected in Toronto's best cafes.",
+    title: "Find your next favourite cafe.",
     desc: "Pair with a stranger over coffee in walking distance. Choose your vibe, " +
           "spin the wheel, and we'll book a quiet table for two.",
     tiles: [
@@ -293,7 +305,7 @@
     } else {
       $("w-link-ig").hidden = true;
     }
-    var mapsQuery = encodeURIComponent((c.name || "") + " Toronto");
+    var mapsQuery = encodeURIComponent(c.name + ", " + cafeLocation(c));
     $("w-link-gmaps").href = "https://www.google.com/maps/search/?api=1&query=" + mapsQuery;
     $("w-link-gmaps").hidden = false;
     $("w-link-amaps").href = "https://maps.apple.com/?q=" + mapsQuery;
@@ -354,8 +366,9 @@
   function buildCafeGrid() {
     if (gridBuilt) return;
     gridBuilt = true;
-    var list = ALL;
+    var list = ALL.filter(function (c) { return cafeCity(c) === activeFilters.city; });
     $("cgp-count").textContent = list.length + " spots";
+    document.querySelector("#cafe-grid-panel .cgp-title").textContent = activeFilters.city + " cafes";
     $("cgp-grid").innerHTML = list.map(function (c) {
       var chips = [];
       if (c.wifi && c.wifi !== "unknown") {
@@ -381,13 +394,13 @@
         "</div>";
     }).join("");
 
-    $("cgp-grid").addEventListener("click", function (e) {
+    $("cgp-grid").onclick = function (e) {
       var card = e.target.closest(".cafe-card");
       if (!card) return;
       var k = card.dataset.key;
       var cafe = ALL.find(function (c) { return key(c) === k; });
       if (cafe) { closeGrid(); showCafeOnMap(cafe); }
-    });
+    };
   }
 
   function openGrid() {
@@ -429,6 +442,31 @@
   /* ===== Filters ===== */
   function updateFilters() { poolCount(); }
 
+  function setCity(city, fly) {
+    if (!CITY_CENTERS[city]) return;
+    activeFilters.city = city;
+    activeFilters.area = null;
+    activeFilters.nearMe = false;
+    $("city-select").value = city;
+    $("fc-area-label").textContent = "By area";
+    $("fc-area").classList.remove("active");
+    $("fc-near").classList.remove("active");
+    $("area-picker").hidden = true;
+    document.querySelectorAll(".area-btn").forEach(function (b) {
+      b.classList.remove("selected");
+      b.hidden = !ALL.some(function (c) { return c.neighborhood === b.dataset.hood && cafeCity(c) === city; });
+    });
+    gridBuilt = false;
+    if (!$("cafe-grid-panel").hidden) buildCafeGrid();
+    poolCount();
+    if (fly && cafeinMap) {
+      var center = CITY_CENTERS[city];
+      closeMap();
+      cafeinMap.flyTo({ center: [center[1], center[0]], zoom: city === "Waterloo" ? 13 : 12, duration: 1000 });
+    }
+  }
+  $("city-select").addEventListener("change", function () { setCity(this.value, true); });
+
   /* Open now */
   $("fc-open").addEventListener("click", function () {
     activeFilters.openNow = !activeFilters.openNow;
@@ -460,6 +498,8 @@
         if (d < bestDist) { bestDist = d; best = h; }
       });
       if (best) {
+        var nearest = ALL.find(function (c) { return c.neighborhood === best; });
+        if (nearest) setCity(cafeCity(nearest), true);
         activeFilters.nearMe = true;
         activeFilters.area = best;
         chip.classList.add("active");
@@ -583,7 +623,7 @@
 
   /* ===== Street View Static photo URL (synchronous — no fetch needed) ===== */
   function cafeStreetViewUrl(c) {
-    var loc = c.address ? c.address + ", Toronto, ON" : c.name + ", " + (c.neighborhood || "") + ", Toronto";
+    var loc = cafeLocation(c);
     return "/api/streetview?size=600x350&location=" + encodeURIComponent(loc);
   }
 
@@ -641,7 +681,7 @@
     else { $("mcd-web").hidden = true; }
     if (hasIg) { $("mcd-ig").href = "https://instagram.com/" + c.instagram.replace(/^@/, ""); $("mcd-ig").hidden = false; }
     else { $("mcd-ig").hidden = true; }
-    var mapsQ = encodeURIComponent((c.name || "") + " Toronto");
+    var mapsQ = encodeURIComponent(c.name + ", " + cafeLocation(c));
     $("mcd-gmaps").href = "https://www.google.com/maps/search/?api=1&query=" + mapsQ;
     $("mcd-amaps").href = "https://maps.apple.com/?q=" + mapsQ;
     $("mcd-links").hidden = false;
@@ -663,6 +703,7 @@
   }
 
   function showCafeOnMap(c) {
+    if (cafeCity(c) !== activeFilters.city) setCity(cafeCity(c), false);
     currentCafe = c;
     try { window.location.hash = "#cafe/" + cafeSlug(c); } catch (e) {}
     populateMcd(c);
@@ -738,8 +779,8 @@
       /* Add named label markers */
       ALL.forEach(function (c) {
         var coord = hoodCoord(c);
-        var jLat = coord[0] + (Math.random() - 0.5) * 0.0025;
-        var jLng = coord[1] + (Math.random() - 0.5) * 0.0035;
+        var jLat = coord[0] + (c.coordinates ? 0 : (Math.random() - 0.5) * 0.0025);
+        var jLng = coord[1] + (c.coordinates ? 0 : (Math.random() - 0.5) * 0.0035);
 
         var el = document.createElement("div");
         el.className = "map-pin-label";
@@ -841,7 +882,7 @@
   $("rail-map").addEventListener("click", function () {
     closeMap(); /* close sidebar if open */
     if (cafeinMap) {
-      cafeinMap.flyTo({ center: [-79.385, 43.655], zoom: 12, pitch: 50, bearing: -10, duration: 1200, essential: true });
+      cafeinMap.flyTo({ center: [CITY_CENTERS[activeFilters.city][1], CITY_CENTERS[activeFilters.city][0]], zoom: 12, pitch: 0, bearing: 0, duration: 1200, essential: true });
     }
   });
   $("map-close").addEventListener("click", closeMap);
@@ -935,6 +976,7 @@
   }());
 
   /* ===== Init: start map immediately, then restore hash or show idle ===== */
+  setCity("Toronto", false);
   initMap();
   if (!loadFromHash()) showIdle();
 })();

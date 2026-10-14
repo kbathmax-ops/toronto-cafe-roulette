@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>caffein — Toronto cafe finder</title>
-<meta name="description" content="Find a Toronto cafe to work from. Filter by open now, near me, or by neighbourhood. Spin the wheel.">
+<title>caffein — Toronto &amp; Waterloo cafe finder</title>
+<meta name="description" content="Find a Toronto or Waterloo cafe to work from. Filter by open now, near me, or by neighbourhood. Spin the wheel.">
+<link rel="preload" href="assets/fonts/ppmori-semibold.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3/dist/maplibre-gl.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -76,7 +77,7 @@
           </div>
           <div class="hero-top">
             <span class="hero-count"><span id="hero-num">110</span><span class="hero-count-unit"> spots</span></span>
-            <span class="hero-city">Toronto, ON</span>
+            <select class="city-select" id="city-select" aria-label="City"><option value="Toronto">Toronto, ON</option><option value="Waterloo">Waterloo, ON</option></select>
           </div>
           <div class="filter-chips" id="filter-chips">
             <button class="filter-chip" id="fc-open" type="button">
@@ -333,7 +334,7 @@
           </div>
 
           <div class="settings-about">
-            caffein &nbsp;·&nbsp; Toronto cafe finder &nbsp;·&nbsp; <span id="settings-cafe-count"></span> spots
+            caffein &nbsp;·&nbsp; Toronto &amp; Waterloo cafe finder &nbsp;·&nbsp; <span id="settings-cafe-count"></span> spots
           </div>
         </div>
       </div>
@@ -345,7 +346,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
           <h2 class="auth-title">Suggest a spot</h2>
-          <p class="auth-desc">Know a great Toronto cafe we're missing? Tell us about it.</p>
+          <p class="auth-desc">Know a great Toronto or Waterloo cafe we're missing? Tell us about it.</p>
           <div id="suggest-form">
             <input class="auth-input" id="sug-name" type="text" placeholder="Cafe name *" required>
             <select class="auth-input sug-select" id="sug-hood">

@@ -1699,3 +1699,36 @@ kbd {
   .topo-cup { animation: none; }
   * { transition-duration: 0.01ms !important; }
 }
+
+/* PP Mori: upright semibold for headings throughout the app. */
+@font-face {
+  font-family: 'PP Mori';
+  src: url('assets/fonts/ppmori-semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+:root { --heading: 'PP Mori', var(--sans); }
+h1, h2, h3, h4, h5, h6, .hero-title, .hero-count, .brand,
+.rail-brand-name, .map-brand-name, .auth-title, .cgp-title,
+#cafe-grid-panel .cgp-title, .cc-name, .mcd-name, .popup-name,
+.map-pin-name, .settings-section-title, #spin-name {
+  font-family: var(--heading);
+  font-weight: 600;
+  font-style: normal;
+  font-synthesis: none;
+}
+.map-brand-name { color: #000; text-shadow: none; }
+.city-select {
+  font: 600 12px var(--heading);
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.city-select option { color: #111; background: #fff; }
+.city-select:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+.area-btn[hidden] { display: none; }
